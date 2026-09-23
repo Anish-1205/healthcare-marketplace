@@ -63,6 +63,11 @@ import { AdminEmployeesPage } from '@/pages/admin/admin-employees-page';
 import { AdminReportsPage } from '@/pages/admin/admin-reports-page';
 import { AdminActivityPage } from '@/pages/admin/admin-activity-page';
 import { AdminSettingsPage } from '@/pages/admin/admin-settings-page';
+import { LabTestsPage } from '@/pages/labs/lab-tests-page';
+import { LabTestDetailPage } from '@/pages/labs/lab-test-detail-page';
+import { LabBookingsPage } from '@/pages/labs/lab-bookings-page';
+import { LabBookingDetailPage } from '@/pages/labs/lab-booking-detail-page';
+import { HealthRecordsPage } from '@/pages/health-records/health-records-page';
 
 export const router = createBrowserRouter([
   {
@@ -95,10 +100,16 @@ export const router = createBrowserRouter([
           { path: '/orders/:id', element: <OrderDetailPage /> },
         ],
       },
-      { path: '/health-records', element: <ComingSoonPage title="Health Records" description="View prescriptions, lab reports and uploaded documents here." /> },
-      { path: '/lab-tests', element: <ComingSoonPage title="Lab Tests" description="Book home-collection lab tests here." /> },
-      { path: '/lab-tests/:id', element: <ComingSoonPage title="Lab Test" /> },
-      { path: '/lab-bookings', element: <ComingSoonPage title="Lab Bookings" /> },
+      { path: '/lab-tests', element: <LabTestsPage /> },
+      { path: '/lab-tests/:id', element: <LabTestDetailPage /> },
+      {
+        element: <RequireRole roles={['PATIENT']} />,
+        children: [
+          { path: '/health-records', element: <HealthRecordsPage /> },
+          { path: '/lab-bookings', element: <LabBookingsPage /> },
+          { path: '/lab-bookings/:id', element: <LabBookingDetailPage /> },
+        ],
+      },
       { path: '/favorites', element: <ComingSoonPage title="Favorites" description="Doctors, clinics and pharmacies you've saved will show up here." /> },
       { path: '/notifications', element: <ComingSoonPage title="Notifications" /> },
       { path: '/profile', element: <ComingSoonPage title="My Profile" description="Manage your personal details and saved addresses here." /> },

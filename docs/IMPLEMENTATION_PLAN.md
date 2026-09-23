@@ -67,7 +67,7 @@ CareBridge is a **sales demo** of a multi-tenant healthcare marketplace. It conn
 | `notifications` | In-app notifications (service + list / unread count / mark read) | 5 ✅ (events wired in 8–12) |
 | `search` / `reference` | Universal header search; specialties, medicine categories, public config | 5 ✅ |
 | `reviews` / `favorites` | Ratings (with moderation) and saved providers | 7, 16 |
-| `labs` / `health-records` | Lab catalogue and bookings, document vault (mock upload) | 15 |
+| `labs` / `health-records` | ✅ Lab catalogue/packages, home collection bookings, status/refund flow, aggregated document vault (mock upload) | 15 ✅ |
 | `onboarding` | Provider registration → `PENDING_APPROVAL` (approval UI in 14) | 5 ✅ |
 | `admin` / `analytics` / `activity-logs` | Platform oversight, approvals, charts, activity feed | 14 |
 
@@ -117,7 +117,7 @@ Integrity rules:
 
 | Portal (layout) | Routes |
 |---|---|
-| **Public / Patient** (`PublicLayout`, `PatientLayout`) | `/`, `/login`, `/register`, `/doctors`, `/doctors/:id`, `/doctors/:id/book`, `/clinics`, `/organizations/:id`, `/medicines`, `/medicines/:id`, `/medicine-categories/:slug`, `/pharmacies`, `/pharmacies/:id`, `/lab-tests`, `/lab-tests/:id`, `/cart`, `/checkout`, `/appointments`, `/appointments/:id`, `/prescriptions`, `/prescriptions/:id`, `/orders`, `/orders/:id`, `/health-records`, `/lab-bookings`, `/favorites`, `/notifications`, `/profile`, `/profile/addresses`, `/register/provider` |
+| **Public / Patient** (`PublicLayout`, `PatientLayout`) | `/`, `/login`, `/register`, `/doctors`, `/doctors/:id`, `/doctors/:id/book`, `/clinics`, `/organizations/:id`, `/medicines`, `/medicines/:id`, `/medicine-categories/:slug`, `/pharmacies`, `/pharmacies/:id`, `/lab-tests`, `/lab-tests/:id`, `/cart`, `/checkout`, `/appointments`, `/appointments/:id`, `/prescriptions`, `/prescriptions/:id`, `/orders`, `/orders/:id`, `/health-records`, `/lab-bookings`, `/lab-bookings/:id`, `/favorites`, `/notifications`, `/profile`, `/profile/addresses`, `/register/provider` |
 | **Doctor** (`DoctorLayout`) ✅ | `/doctor`, `/doctor/appointments`, `/doctor/appointments/:id`, `/doctor/patients`, `/doctor/patients/:id`, `/doctor/consultations`, `/doctor/consultations/:id`, `/doctor/prescriptions`, `/doctor/prescriptions/:id`, `/doctor/availability`, `/doctor/profile`, `/doctor/notifications` |
 | **Pharmacy** (`PharmacyLayout`) | `/pharmacy`, `/pharmacy/orders`, `/pharmacy/orders/:id`, `/pharmacy/prescriptions`, `/pharmacy/inventory`, `/pharmacy/medicines`, `/pharmacy/deliveries`, `/pharmacy/customers`, `/pharmacy/reports`, `/pharmacy/profile`, `/pharmacy/settings` |
 | **Clinic / Hospital** (`OrganizationLayout`) | `/organization`, `/organization/doctors`, `/organization/appointments`, `/organization/patients`, `/organization/services`, `/organization/staff`, `/organization/schedules`, `/organization/reports`, `/organization/profile` |
@@ -154,7 +154,7 @@ All responses use `{ success, data, meta? }` or `{ success: false, error: { code
 | Payments | ✅ `POST /payments/simulate` (existing order payment, patient-owned, idempotent; cash settles on completion) · ✅ `GET /payments` (patient/platform scope, pagination) |
 | Deliveries | ✅ `POST /orders/:id/delivery` (assign simulated agent to a ready delivery order) · ✅ `POST /deliveries/:id/status` (strict progression; synchronizes order history/status) |
 | Engagement | `GET/POST /reviews` · `GET/POST/DELETE /favorites` |
-| Labs & records | `GET /labs/tests` · `GET /labs/tests/:id` · `POST /labs/bookings` · `GET /labs/bookings` · `GET/POST/DELETE /health-records/documents` · `GET /health-records/summary` |
+| Labs & records | ✅ `GET /lab-tests` · ✅ `GET /lab-tests/categories` · ✅ `GET /lab-tests/:id` · ✅ `GET /lab-bookings/context` · ✅ `POST /lab-bookings` · ✅ `GET /lab-bookings` · ✅ `GET /lab-bookings/:id` · ✅ `POST /lab-bookings/:id/cancel` · ✅ `GET /health-records` · ✅ `GET/POST/DELETE /health-records/documents` |
 | Admin | `GET /admin/overview` · `GET /admin/{organizations,doctors,patients,pharmacies,appointments,orders,employees,activity}` · `POST /admin/approvals/:type/:id/{approve,reject}` · `PATCH /admin/users/:id/status` · `POST/PATCH /admin/employees` · `GET/PATCH /admin/settings` · `GET /admin/reports/*` |
 
 Lists support `page`, `pageSize` (max 100), filters and `sort` where useful.
@@ -264,7 +264,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 12 | Orders & delivery | ✅ Checkout (saved/new address, delivery/pickup, prescription, fee breakdown, simulated payment), confirmation, patient order list/detail with timestamped tracking and cancellation; PharmacyLayout with scoped orders, prescription/stock/quantity/price review, accept/reject and preparation; simulated agent assignment and delivery progression, notifications and activity logs |
 | 13 | Clinic/hospital portal | ✅ OrganizationLayout; dashboard; scoped doctors, appointments, patients, staff, services and schedules; reports; profile management |
 | 14 | Admin portal | ✅ Overview, approvals, management, activity, reports, settings, charts |
-| 15 | Lab tests & health records | Catalogue, booking, document vault |
+| 15 | Lab tests & health records | ✅ Catalogue/packages, home collection booking and status, simulated payment/refund, aggregated health-record vault, mock upload |
 | 16 | Cross-portal integration | Notifications, reviews, favorites wiring |
 | 17 | UI polish | Loading/empty/error states, responsive, mobile nav |
 | 18 | Testing | Booking, prescriptions, orders, tenant isolation, status progression |
@@ -308,3 +308,11 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 - Platform employees can search and inspect marketplace records, review mock onboarding documents, approve or reject providers, and see platform-wide appointments, orders and activity. Platform admins can additionally create organizations, activate/deactivate accounts and providers, create/edit employees, change platform roles and update validated settings. Super-admin accounts are protected from role and status changes.
 - Replaced the provider-registration placeholder with doctor, clinic, hospital and pharmacy onboarding forms. Submissions use the existing authenticated onboarding flow, attach mock document metadata, enter pending approval and notify the review team.
 - Verification: **167/167 API tests passed across 15 files**, including 7 new admin integration tests; workspace typecheck passed; API and web production builds passed. The web build retains the existing dependency annotation and bundle-size warnings.
+
+### Phase 15 implementation and verification
+
+- Replaced the lab placeholders with a public, searchable catalogue of the 17 seeded demo tests and packages. Detail pages show pricing, parameters, sample and fasting requirements, turnaround estimates and the tests included in each package.
+- Patients can book demo home collection against a saved or newly entered address, choose a date and time slot, and use a simulated UPI or card payment. The API validates catalogue availability, date range and address ownership, calculates totals from database prices, creates notification/activity records and exposes booking status tracking. A booked collection can be cancelled once and its simulated payment is refunded.
+- Added a patient-only Health Records page that combines issued prescriptions, consultations, appointment history, uploaded documents and generated lab reports. PDF/JPG/PNG mock uploads store validated metadata up to 10 MB; patients can list and delete their own uploads, while linked lab reports are protected.
+- Existing Prisma models and seed data covered the phase, so no migration was required. Lab processing remains intentionally simulated and the UI clearly identifies demo reports and payments.
+- Verification: **176/176 API tests passed across 16 files**, including 9 new lab and health-record integration tests; workspace typecheck passed; API and web production builds passed. The web build retains the existing dependency annotation and bundle-size warnings.

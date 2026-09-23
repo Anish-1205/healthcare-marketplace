@@ -4,7 +4,7 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 
 > **Demo only.** This is a demonstration application. Healthcare information shown here is sample data and must not be used for medical decisions. Payments, delivery, video consultation and messaging are simulated.
 
-**Status:** Phases 0–14 are complete: platform foundations, patient marketplace and appointments, doctor consultations and prescriptions, pharmacy ordering and delivery, clinic/hospital operations, and the platform administration portal. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+**Status:** Phases 0–15 are complete: platform foundations, patient marketplace and appointments, doctor consultations and prescriptions, pharmacy ordering and delivery, clinic/hospital and platform operations, plus demo lab tests and patient health records. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Stack
 
@@ -119,11 +119,11 @@ docker exec carebridge-postgres psql -U carebridge -c "CREATE DATABASE carebridg
 pnpm test
 ```
 
-The suite covers login for every demo account, registration, password reset, token/deactivation handling, the RBAC matrix, tenant isolation, route authorization, seed invariants (data volumes, golden numbering, data consistency across portals), provider onboarding and approval, platform management, notifications, global search and doctor/organization/pharmacy/medicine discovery (filters, pagination, real slot availability).
+The suite covers login for every demo account, registration, password reset, token/deactivation handling, the RBAC matrix, tenant isolation, route authorization, seed invariants (data volumes, golden numbering, data consistency across portals), provider onboarding and approval, platform management, lab booking and health-record isolation, notifications, global search and doctor/organization/pharmacy/medicine discovery (filters, pagination, real slot availability).
 
 ## Web app
 
-`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*`, `/organization/*`, `/pharmacy/*`, and `/admin/*` provide role-protected workspaces for doctors, clinics/hospitals, pharmacies, and the platform team. Health records, lab tests, favorites, and the patient notifications list remain clearly labelled upcoming features for later phases.
+`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*`, `/organization/*`, `/pharmacy/*`, and `/admin/*` provide role-protected workspaces for doctors, clinics/hospitals, pharmacies, and the platform team. Patients can browse `/lab-tests`, track `/lab-bookings`, and use the mock document vault at `/health-records`. Favorites and the patient notifications list remain clearly labelled upcoming features for later phases.
 
 - `pnpm --filter @carebridge/web dev` — dev server on 5173, proxies `/api/*` to the API on 4000
 - `pnpm --filter @carebridge/web build` — typecheck + production build

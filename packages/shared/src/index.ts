@@ -8,6 +8,7 @@ export * from './appointments';
 export * from './doctor-portal';
 export * from './organization-portal';
 export * from './admin';
+export * from './labs';
 export * from './clinical';
 export * from './cart';
 export type * from './orders';

@@ -19,6 +19,7 @@ import { referenceRouter } from '../modules/reference/reference.routes';
 import { searchRouter } from '../modules/search/search.routes';
 import { ok } from '../utils/http';
 import { adminRouter } from '../modules/admin/admin.routes';
+import { healthRecordsRouter, labBookingsRouter, labTestsRouter } from '../modules/labs/labs.routes';
 
 export const apiV1 = Router();
 
@@ -44,4 +45,7 @@ apiV1.use('/orders', ordersRouter);
 apiV1.use('/deliveries', deliveriesRouter);
 apiV1.use('/payments', paymentsRouter);
 apiV1.use('/admin', adminRouter);
+apiV1.use('/lab-tests', labTestsRouter);
+apiV1.use('/lab-bookings', labBookingsRouter);
+apiV1.use('/health-records', healthRecordsRouter);
 apiV1.use('/', referenceRouter); // /config, /specialties, /medicine-categories
