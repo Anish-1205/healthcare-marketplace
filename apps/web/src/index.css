@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CareBridge design tokens.
+ * Primary: deep teal (healthcare/trust). Secondary: fresh green (wellness/positive action).
+ * Surface pastels back the service and category cards across the marketplace.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 200 35% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 200 35% 12%;
+
+    --primary: 189 75% 26%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 152 55% 38%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 200 20% 96%;
+    --muted-foreground: 200 12% 42%;
+
+    --accent: 189 60% 94%;
+    --accent-foreground: 189 75% 22%;
+
+    --destructive: 4 78% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 20% 90%;
+    --input: 200 20% 88%;
+    --ring: 189 75% 30%;
+
+    --radius: 1rem;
+
+    /* Pastel service/category card surfaces */
+    --surface-mint: 156 45% 92%;
+    --surface-mint-foreground: 156 45% 20%;
+    --surface-cream: 40 55% 92%;
+    --surface-cream-foreground: 32 45% 24%;
+    --surface-blush: 340 55% 94%;
+    --surface-blush-foreground: 340 45% 28%;
+    --surface-sky: 205 60% 93%;
+    --surface-sky-foreground: 205 55% 24%;
+    --surface-lavender: 258 45% 94%;
+    --surface-lavender-foreground: 258 35% 30%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/*
+ * Printing a prescription: only `.print-sheet` reaches the paper. Everything else is hidden
+ * rather than unmounted, so the same page serves both screen and print.
+ */
+@media print {
+  body {
+    background: #fff;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible;
+  }
+  .print-sheet {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .print-hidden {
+    display: none !important;
+  }
+}

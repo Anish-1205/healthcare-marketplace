@@ -1,0 +1,26 @@
+{
+  "name": "carebridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CareBridge - demo healthcare marketplace (patients, doctors, clinics, hospitals, pharmacies, platform admin)",
+  "packageManager": "pnpm@10.31.0",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "postinstall": "pnpm --filter @carebridge/shared build",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "dev:api": "pnpm --filter @carebridge/api dev",
+    "db:generate": "pnpm --filter @carebridge/api db:generate",
+    "db:migrate": "pnpm --filter @carebridge/api db:migrate",
+    "db:deploy": "pnpm --filter @carebridge/api db:deploy",
+    "db:seed": "pnpm --filter @carebridge/api db:seed",
+    "db:seed:ready": "pnpm --filter @carebridge/api db:seed:ready",
+    "db:seed:complete": "pnpm --filter @carebridge/api db:seed:complete",
+    "db:reset": "pnpm --filter @carebridge/api db:reset",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down"
+  }
+}

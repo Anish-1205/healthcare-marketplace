@@ -1,0 +1,21 @@
+# Optional: local PostgreSQL for development. Use this OR an existing local PostgreSQL install.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: carebridge-postgres
+    environment:
+      POSTGRES_USER: carebridge
+      POSTGRES_PASSWORD: carebridge
+      POSTGRES_DB: carebridge
+    ports:
+      - "5433:5432"
+    volumes:
+      - carebridge-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carebridge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  carebridge-pgdata:
