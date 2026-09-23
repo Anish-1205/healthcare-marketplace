@@ -11,6 +11,9 @@ import {
 
 export const adminRouter = Router();
 adminRouter.use(authenticate);
+adminRouter.get('/reviews', requirePermission(PERMISSIONS.REVIEW_MODERATE), async (_req, res) => ok(res, await service.listReviews()));
+adminRouter.post('/reviews/:id/approve', requirePermission(PERMISSIONS.REVIEW_MODERATE), async (req, res) => ok(res, await service.moderateReview(getAuth(req), parse(uuidParam, req.params).id, 'APPROVED')));
+adminRouter.post('/reviews/:id/reject', requirePermission(PERMISSIONS.REVIEW_MODERATE), async (req, res) => ok(res, await service.moderateReview(getAuth(req), parse(uuidParam, req.params).id, 'REJECTED')));
 
 const readDashboard = requirePermission(PERMISSIONS.ADMIN_DASHBOARD_READ);
 const readData = requirePermission(PERMISSIONS.ADMIN_DATA_READ);

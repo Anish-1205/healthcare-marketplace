@@ -1,5 +1,7 @@
 import { Bed, Building2, Clock, MapPin, Phone, Siren } from 'lucide-react';
 import { useState } from 'react';
+import { FavoriteButton } from '@/components/favorite-button';
+import { PatientReview } from '@/components/patient-review';
 import { useParams } from 'react-router-dom';
 import { DoctorCard } from '@/components/doctor-card';
 import { Avatar } from '@/components/ui/avatar';
@@ -35,6 +37,7 @@ export function OrganizationDetailPage() {
   return (
     <div className="container py-8">
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <FavoriteButton targetType="ORGANIZATION" targetId={org.id} /><PatientReview key={org.id} targetType="ORGANIZATION" targetId={org.id} />
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
           {org.logoUrl && !logoFailed ? (
             <img src={org.logoUrl} alt={org.name} onError={() => setLogoFailed(true)} className="h-20 w-20 rounded-2xl object-cover" />

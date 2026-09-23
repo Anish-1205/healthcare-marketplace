@@ -21,7 +21,12 @@ import { ok } from '../utils/http';
 import { adminRouter } from '../modules/admin/admin.routes';
 import { healthRecordsRouter, labBookingsRouter, labTestsRouter } from '../modules/labs/labs.routes';
 
+import { reviewsRouter } from '../modules/reviews/reviews.routes';
+import { favoritesRouter } from '../modules/favorites/favorites.routes';
+
 export const apiV1 = Router();
+apiV1.use('/reviews', reviewsRouter);
+apiV1.use('/favorites', favoritesRouter);
 
 apiV1.get('/health', async (_req, res) => {
   await prisma.$queryRaw`SELECT 1`;

@@ -12,6 +12,8 @@ import { usePharmacy } from '@/hooks/use-pharmacies';
 import { useCart } from '@/hooks/use-cart';
 import { avatarHue, formatDistance } from '@/lib/utils';
 import { useState } from 'react';
+import { FavoriteButton } from '@/components/favorite-button';
+import { PatientReview } from '@/components/patient-review';
 
 export function PharmacyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -48,6 +50,7 @@ export function PharmacyDetailPage() {
   return (
     <div className="container py-8">
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <FavoriteButton targetType="PHARMACY" targetId={pharmacy.id} /><PatientReview key={pharmacy.id} targetType="PHARMACY" targetId={pharmacy.id} />
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
           {pharmacy.logoUrl && !logoFailed ? (
             <img src={pharmacy.logoUrl} alt={pharmacy.name} onError={() => setLogoFailed(true)} className="h-20 w-20 rounded-2xl object-cover" />

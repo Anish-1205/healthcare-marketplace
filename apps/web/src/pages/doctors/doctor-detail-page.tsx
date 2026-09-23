@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { FavoriteButton } from '@/components/favorite-button';
+import { PatientReview } from '@/components/patient-review';
 import type { AvailableSlot } from '@carebridge/shared';
 import { Building2, Globe, GraduationCap, MessageSquareText } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -48,6 +50,7 @@ export function DoctorDetailPage() {
   return (
     <div className="container py-8">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-3"><FavoriteButton targetType="DOCTOR" targetId={doctor.id} /><PatientReview key={doctor.id} targetType="DOCTOR" targetId={doctor.id} /></div>
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="flex flex-col gap-5 sm:flex-row">

@@ -8,6 +8,7 @@ import { useCurrentUser, useLogout } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 const links = [
+  ['/admin/reviews', 'Reviews', CheckCircle2, 'review.moderate'],
   ['/admin', 'Overview', LayoutDashboard, null], ['/admin/organizations', 'Organizations', Building2, null], ['/admin/doctors', 'Doctors', Stethoscope, null],
   ['/admin/patients', 'Patients', UserRound, null], ['/admin/pharmacies', 'Pharmacies', ShieldCheck, null], ['/admin/appointments', 'Appointments', CalendarDays, null],
   ['/admin/orders', 'Orders', Package, null], ['/admin/approvals', 'Approvals', CheckCircle2, null], ['/admin/employees', 'Employees', Users, 'employee.manage'],

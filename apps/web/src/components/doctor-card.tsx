@@ -1,4 +1,5 @@
 import type { DoctorSummary } from '@carebridge/shared';
+import { FavoriteButton } from './favorite-button';
 import { Building2, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
@@ -49,6 +50,7 @@ export function DoctorCard({ doctor, className }: { doctor: DoctorSummary; class
       </div>
 
       <div className="mt-4 flex gap-2">
+        <FavoriteButton targetType="DOCTOR" targetId={doctor.id} />
         <Link to={`/doctors/${doctor.slug}`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'flex-1')}>
           View Profile
         </Link>

@@ -32,6 +32,7 @@ export const ACTIVITY = {
   HEALTH_DOCUMENT_UPLOADED: 'health_record.uploaded',
   HEALTH_DOCUMENT_DELETED: 'health_record.deleted',
   REVIEW_SUBMITTED: 'review.submitted',
+  REVIEW_MODERATED: 'review.moderated',
   USER_STATUS_UPDATED: 'admin.user_status_updated',
   ENTITY_STATUS_UPDATED: 'admin.entity_status_updated',
   EMPLOYEE_CREATED: 'admin.employee_created',

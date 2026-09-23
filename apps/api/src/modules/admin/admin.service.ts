@@ -16,6 +16,27 @@ import type { CreateAdminOrganizationPayload } from '@carebridge/shared';
 import type { CreateEmployeeInput, UpdateEmployeeInput } from './admin.schemas';
 
 type PageQuery = { page: number; pageSize: number; q?: string };
+export async function listReviews() {
+  const rows = await prisma.review.findMany({ orderBy: { createdAt: 'desc' }, include: { doctor: { include: { user: { select: { firstName: true, lastName: true } } } }, organization: { select: { name: true } } } });
+  return rows.map(({ doctor, organization, ...review }) => ({ ...review, targetName: doctor ? `Dr. ${doctor.user.firstName} ${doctor.user.lastName}` : organization!.name }));
+}
+
+export async function moderateReview(auth: AuthContext, id: string, status: 'APPROVED' | 'REJECTED') {
+  return prisma.$transaction(async (tx) => {
+    const review = await tx.review.findUnique({ where: { id } });
+    if (!review) throw notFound('Review');
+    // All moderation for a provider shares a lock, including reversals and retries.
+    if (review.doctorId) await tx.$queryRaw`SELECT id FROM doctors WHERE id = ${review.doctorId}::uuid FOR UPDATE`;
+    else await tx.$queryRaw`SELECT id FROM organizations WHERE id = ${review.organizationId}::uuid FOR UPDATE`;
+    const updated = await tx.review.update({ where: { id }, data: { status } });
+    const totals = await tx.review.aggregate({ where: { ...(review.doctorId ? { doctorId: review.doctorId } : { organizationId: review.organizationId }), status: 'APPROVED' }, _avg: { rating: true }, _count: true });
+    const data = { avgRating: totals._avg.rating ?? 0, reviewCount: totals._count };
+    if (review.doctorId) await tx.doctor.update({ where: { id: review.doctorId }, data });
+    else await tx.organization.update({ where: { id: review.organizationId! }, data });
+    await logActivity({ action: ACTIVITY.REVIEW_MODERATED, entityType: 'Review', entityId: id, actorUserId: auth.userId, description: `Review ${status.toLowerCase()}`, metadata: { status } }, tx);
+    return updated;
+  });
+}
 const dateRange = (from?: string, to?: string, defaultDays = 29) => {
   const end = to ? new Date(`${to}T23:59:59.999Z`) : new Date();
   const start = from ? new Date(`${from}T00:00:00.000Z`) : new Date(end.getTime() - defaultDays * 86_400_000);

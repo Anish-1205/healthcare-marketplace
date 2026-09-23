@@ -1,4 +1,5 @@
 import type { OrganizationSummary } from '@carebridge/shared';
+import { FavoriteButton } from './favorite-button';
 import { Building2, Clock, MapPin, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -70,6 +71,7 @@ export function OrganizationCard({ organization, className }: { organization: Or
       )}
 
       <div className="mt-3 flex items-center justify-between">
+        <FavoriteButton targetType="ORGANIZATION" targetId={organization.id} />
         <RatingStars rating={organization.avgRating} showValue={false} />
         <Badge variant={organization.isOpenNow ? 'success' : 'muted'}>{organization.isOpenNow ? 'Open' : 'Closed'}</Badge>
       </div>

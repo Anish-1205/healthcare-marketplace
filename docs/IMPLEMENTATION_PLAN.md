@@ -153,7 +153,7 @@ All responses use `{ success, data, meta? }` or `{ success: false, error: { code
 | Orders | ✅ `GET /orders/checkout` (cart, saved addresses, configured platform fee) · ✅ `POST /orders` (checkout) · ✅ `GET /orders` (role-scoped, status filter, pagination) · ✅ `GET /orders/:id` · ✅ `POST /orders/:id/status` (pharmacy review/approved quantities/prices and progression) · ✅ `POST /orders/:id/cancel` (own order, before preparation) |
 | Payments | ✅ `POST /payments/simulate` (existing order payment, patient-owned, idempotent; cash settles on completion) · ✅ `GET /payments` (patient/platform scope, pagination) |
 | Deliveries | ✅ `POST /orders/:id/delivery` (assign simulated agent to a ready delivery order) · ✅ `POST /deliveries/:id/status` (strict progression; synchronizes order history/status) |
-| Engagement | `GET/POST /reviews` · `GET/POST/DELETE /favorites` |
+| Engagement | ✅ `GET/POST /reviews` · ✅ `GET /reviews/eligibility` · ✅ `GET/POST /favorites` · ✅ `DELETE /favorites/:id` · ✅ `GET /admin/reviews` · ✅ `POST /admin/reviews/:id/approve` / `reject` |
 | Labs & records | ✅ `GET /lab-tests` · ✅ `GET /lab-tests/categories` · ✅ `GET /lab-tests/:id` · ✅ `GET /lab-bookings/context` · ✅ `POST /lab-bookings` · ✅ `GET /lab-bookings` · ✅ `GET /lab-bookings/:id` · ✅ `POST /lab-bookings/:id/cancel` · ✅ `GET /health-records` · ✅ `GET/POST/DELETE /health-records/documents` |
 | Admin | `GET /admin/overview` · `GET /admin/{organizations,doctors,patients,pharmacies,appointments,orders,employees,activity}` · `POST /admin/approvals/:type/:id/{approve,reject}` · `PATCH /admin/users/:id/status` · `POST/PATCH /admin/employees` · `GET/PATCH /admin/settings` · `GET /admin/reports/*` |
 
@@ -265,7 +265,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 13 | Clinic/hospital portal | ✅ OrganizationLayout; dashboard; scoped doctors, appointments, patients, staff, services and schedules; reports; profile management |
 | 14 | Admin portal | ✅ Overview, approvals, management, activity, reports, settings, charts |
 | 15 | Lab tests & health records | ✅ Catalogue/packages, home collection booking and status, simulated payment/refund, aggregated health-record vault, mock upload |
-| 16 | Cross-portal integration | Notifications, reviews, favorites wiring |
+| 16 | Cross-portal integration | ✅ Notifications; eligible patient reviews, admin moderation and rating recalculation; saved providers across cards, detail pages and favorites |
 | 17 | UI polish | Loading/empty/error states, responsive, mobile nav |
 | 18 | Testing | Booking, prescriptions, orders, tenant isolation, status progression |
 | 19 | Documentation | README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS |
@@ -319,11 +319,14 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 
 ### Phase 16 implementation and verification
 
-- The patient `/notifications` route now renders the shared notifications page instead of a stale placeholder, with the unread list verified to match the bell icon's unread count.
-- The admin appointments list now sorts newest-created first, so freshly booked appointments appear on page 1 instead of being pushed past the default page size.
-- Post-login redirects now only honour a saved destination when it falls inside the authenticated user's own portal, so staff members are no longer redirected to stale patient routes after logging in.
-- Added a web unit-test suite (Vitest) and a Playwright end-to-end suite; the admin-ordering e2e test books its own appointment rather than relying on seed-data ordering.
-- Verification: API tests passed; new Vitest and Playwright suites passed; workspace typecheck passed.
+- Implemented `POST /reviews`, public approved-only `GET /reviews`, patient-scoped `GET /reviews?mine=true`, and `GET /reviews/eligibility`. Target filters accept a type and UUID. Ratings must be integers from 1–5 and written reviews are required (up to 4,000 characters).
+- Doctor, clinic and hospital reviews require the patient's own completed appointment with that target; pharmacy reviews require their own delivered order. Pharmacies use the existing organization relationship. New reviews are always `PENDING`; patients see their existing pending/approved/rejected review instead of another form. Patient-row locking prevents concurrent duplicate submissions for a provider.
+- Added the permission-protected `/admin/reviews` moderation page and list/approve/reject APIs. Moderation atomically recomputes the target's average and count using approved reviews only, including approval reversals and zero approved reviews. Provider-row locking serializes concurrent moderation; decisions are activity-logged. Public provider detail pages continue to exclude pending and rejected reviews.
+- Implemented patient-scoped favorites list/add/remove APIs, idempotent adds, ownership-checked removal, save/unsave buttons on doctor and organization cards (including pharmacies) and all provider detail pages. Replaced the favorites placeholder with a patient-only saved-provider page linking to each provider.
+- Existing notification integration remains in place. No schema migration was required. No Phase 17 work was undertaken in this implementation.
+- Verification: **198/198 API tests across 17 files**, including **20 new engagement tests**; **17/17 web unit tests across 3 files**, including **6 review-form tests**; **14/14 Playwright tests**, including **4 full provider workflows** covering doctor, clinic, hospital and pharmacy. Workspace `pnpm -r typecheck` and `pnpm -r build` passed. The web build retains the existing dependency annotation and bundle-size warnings.
+- API integration tests and browser tests use the isolated `carebridge_test` database. Playwright now migrates/seeds it, runs dedicated servers on ports 4001/5174, uses separate patient/admin browser sessions, and starts the API without a file watcher. Fixture creation/cleanup runs in an API-side process. Final browser run passed all 14 tests in 39.3 seconds.
+- Final route inspection confirmed mounted POST handlers in `reviews/reviews.routes.ts` and `favorites/favorites.routes.ts`. HTTP integration tests received **201** responses and verified persisted records through subsequent reads; browser tests submitted reviews and saved/removed providers through the real API.
 
 ### Phase 17 implementation and verification
 

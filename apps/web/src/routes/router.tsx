@@ -1,4 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { FavoritesPage } from '@/pages/favorites-page';
+import { AdminReviewsPage } from '@/pages/admin/admin-reviews-page';
 import { CheckoutPage } from '@/pages/orders/checkout-page';
 import { OrdersPage } from '@/pages/orders/orders-page';
 import { OrderDetailPage } from '@/pages/orders/order-detail-page';
@@ -106,11 +108,11 @@ export const router = createBrowserRouter([
         element: <RequireRole roles={['PATIENT']} />,
         children: [
           { path: '/health-records', element: <HealthRecordsPage /> },
+          { path: '/favorites', element: <FavoritesPage /> },
           { path: '/lab-bookings', element: <LabBookingsPage /> },
           { path: '/lab-bookings/:id', element: <LabBookingDetailPage /> },
         ],
       },
-      { path: '/favorites', element: <ComingSoonPage title="Favorites" description="Doctors, clinics and pharmacies you've saved will show up here." /> },
       { path: '/notifications', element: <NotificationsPage /> },
       { path: '/profile', element: <ComingSoonPage title="My Profile" description="Manage your personal details and saved addresses here." /> },
       { path: '/profile/addresses', element: <ComingSoonPage title="Saved Addresses" /> },
@@ -175,6 +177,7 @@ export const router = createBrowserRouter([
         { path: '/admin/appointments', element: <AdminAppointmentsPage /> },
         { path: '/admin/orders', element: <AdminOrdersPage /> },
         { path: '/admin/approvals', element: <AdminApprovalsPage /> },
+        { element: <RequirePermission permission="review.moderate" />, children: [{ path: '/admin/reviews', element: <AdminReviewsPage /> }] },
         { path: '/admin/reports', element: <AdminReportsPage /> },
         { path: '/admin/activity', element: <AdminActivityPage /> },
         { element: <RequirePermission permission="employee.manage" />, children: [{ path: '/admin/employees', element: <AdminEmployeesPage /> }] },
