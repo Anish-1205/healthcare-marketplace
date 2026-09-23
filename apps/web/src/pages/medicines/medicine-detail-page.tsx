@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAddToCart } from '@/hooks/use-add-to-cart';
 import { useCart, useRemoveCartItem, useUpdateCartItem } from '@/hooks/use-cart';
 import { useMedicine } from '@/hooks/use-medicines';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 export function MedicineDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,8 +42,8 @@ export function MedicineDetailPage() {
   return (
     <div className="container py-8">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="flex aspect-square items-center justify-center rounded-2xl bg-mint">
-          {medicine.imageUrl ? <img src={medicine.imageUrl} alt={medicine.name} className="h-3/4 w-3/4 object-contain" /> : <Pill className="h-24 w-24 text-mint-foreground/50" />}
+        <div className={cn('flex aspect-square items-center justify-center rounded-2xl', !medicine.imageUrl && 'bg-mint')}>
+          {medicine.imageUrl ? <img src={medicine.imageUrl} alt={medicine.name} className="h-full w-full object-contain" /> : <Pill className="h-24 w-24 text-mint-foreground/50" />}
         </div>
 
         <div>

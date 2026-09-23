@@ -1,5 +1,5 @@
-import { avatarHue, initials } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { avatarHue, cn, initials } from '@/lib/utils';
 
 interface AvatarProps {
   firstName: string;
@@ -13,8 +13,9 @@ const SIZE_CLASSES = { sm: 'h-8 w-8 text-xs', md: 'h-11 w-11 text-sm', lg: 'h-16
 
 /** Gradient initials avatar — no external image dependency, per the demo-data strategy. */
 export function Avatar({ firstName, lastName = '', imageUrl, className, size = 'md' }: AvatarProps) {
-  if (imageUrl) {
-    return <img src={imageUrl} alt={`${firstName} ${lastName}`} className={cn('rounded-full object-cover', SIZE_CLASSES[size], className)} />;
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (imageUrl && imageUrl !== failedUrl) {
+    return <img src={imageUrl} alt={`${firstName} ${lastName}`} onError={() => setFailedUrl(imageUrl)} className={cn('rounded-full object-cover', SIZE_CLASSES[size], className)} />;
   }
   const hue = avatarHue(`${firstName}${lastName}`);
   return (

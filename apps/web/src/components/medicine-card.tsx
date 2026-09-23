@@ -32,9 +32,9 @@ export function MedicineCard({ medicine, pharmacyId, className }: { medicine: Me
 
   return (
     <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md', className)}>
-      <Link to={`/medicines/${medicine.slug}`} className="flex aspect-square items-center justify-center rounded-xl bg-mint">
+      <Link to={`/medicines/${medicine.slug}`} className={cn('flex aspect-square items-center justify-center rounded-xl', !medicine.imageUrl && 'bg-mint')}>
         {medicine.imageUrl ? (
-          <img src={medicine.imageUrl} alt={medicine.name} className="h-3/4 w-3/4 object-contain" />
+          <img src={medicine.imageUrl} alt={medicine.name} className="h-full w-full object-contain" />
         ) : (
           <Pill className="h-10 w-10 text-mint-foreground/50" />
         )}
