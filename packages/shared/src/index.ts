@@ -7,6 +7,7 @@ export * from './catalog';
 export * from './appointments';
 export * from './doctor-portal';
 export * from './organization-portal';
+export * from './admin';
 export * from './clinical';
 export * from './cart';
 export type * from './orders';

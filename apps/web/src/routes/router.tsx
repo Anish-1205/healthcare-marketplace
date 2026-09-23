@@ -4,10 +4,12 @@ import { OrdersPage } from '@/pages/orders/orders-page';
 import { OrderDetailPage } from '@/pages/orders/order-detail-page';
 import { PharmacyLayout } from '@/layouts/pharmacy-layout';
 import { OrganizationLayout } from '@/layouts/organization-layout';
+import { AdminLayout } from '@/layouts/admin-layout';
 import { PublicLayout } from '@/layouts/public-layout';
 import { DoctorLayout } from '@/layouts/doctor-layout';
 import { RequireAuth } from '@/components/require-auth';
 import { RequireRole } from '@/components/require-role';
+import { RequirePermission } from '@/components/require-permission';
 import { ComingSoonPage } from '@/pages/coming-soon-page';
 import { AppointmentDetailPage } from '@/pages/appointments/appointment-detail-page';
 import { AppointmentsPage } from '@/pages/appointments/appointments-page';
@@ -15,6 +17,7 @@ import { BookAppointmentPage } from '@/pages/appointments/book-appointment-page'
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password-page';
 import { LoginPage } from '@/pages/auth/login-page';
 import { RegisterPage } from '@/pages/auth/register-page';
+import { ProviderRegistrationPage } from '@/pages/auth/provider-registration-page';
 import { ResetPasswordPage } from '@/pages/auth/reset-password-page';
 import { DoctorDetailPage } from '@/pages/doctors/doctor-detail-page';
 import { DoctorsPage } from '@/pages/doctors/doctors-page';
@@ -51,6 +54,15 @@ import { OrganizationStaffPage } from '@/pages/organization/organization-staff-p
 import { OrganizationSchedulesPage } from '@/pages/organization/organization-schedules-page';
 import { OrganizationReportsPage } from '@/pages/organization/organization-reports-page';
 import { OrganizationProfilePage } from '@/pages/organization/organization-profile-page';
+import { AdminDashboardPage } from '@/pages/admin/admin-dashboard-page';
+import { AdminOrganizationsPage, AdminDoctorsPage, AdminPatientsPage } from '@/pages/admin/admin-entities-page';
+import { AdminOrganizationDetailPage, AdminDoctorDetailPage, AdminPatientDetailPage } from '@/pages/admin/admin-entity-detail-page';
+import { AdminAppointmentsPage, AdminOrdersPage } from '@/pages/admin/admin-transactions-page';
+import { AdminApprovalsPage } from '@/pages/admin/admin-approvals-page';
+import { AdminEmployeesPage } from '@/pages/admin/admin-employees-page';
+import { AdminReportsPage } from '@/pages/admin/admin-reports-page';
+import { AdminActivityPage } from '@/pages/admin/admin-activity-page';
+import { AdminSettingsPage } from '@/pages/admin/admin-settings-page';
 
 export const router = createBrowserRouter([
   {
@@ -91,7 +103,7 @@ export const router = createBrowserRouter([
       { path: '/notifications', element: <ComingSoonPage title="Notifications" /> },
       { path: '/profile', element: <ComingSoonPage title="My Profile" description="Manage your personal details and saved addresses here." /> },
       { path: '/profile/addresses', element: <ComingSoonPage title="Saved Addresses" /> },
-      { path: '/register/provider', element: <ComingSoonPage title="Register as a Provider" description="Doctor, clinic, hospital and pharmacy registration is launching soon." /> },
+      { path: '/register/provider', element: <ProviderRegistrationPage /> },
 
       { path: '*', element: <NotFoundPage /> },
     ],
@@ -133,6 +145,29 @@ export const router = createBrowserRouter([
         { path: '/organization/schedules', element: <OrganizationSchedulesPage /> },
         { path: '/organization/reports', element: <OrganizationReportsPage /> },
         { path: '/organization/profile', element: <OrganizationProfilePage /> },
+      ],
+    }],
+  },
+  {
+    element: <RequireRole roles={['PLATFORM_EMPLOYEE', 'PLATFORM_ADMIN', 'SUPER_ADMIN']} />,
+    children: [{
+      element: <AdminLayout />,
+      children: [
+        { path: '/admin', element: <AdminDashboardPage /> },
+        { path: '/admin/organizations', element: <AdminOrganizationsPage /> },
+        { path: '/admin/organizations/:id', element: <AdminOrganizationDetailPage /> },
+        { path: '/admin/doctors', element: <AdminDoctorsPage /> },
+        { path: '/admin/doctors/:id', element: <AdminDoctorDetailPage /> },
+        { path: '/admin/patients', element: <AdminPatientsPage /> },
+        { path: '/admin/patients/:id', element: <AdminPatientDetailPage /> },
+        { path: '/admin/pharmacies', element: <AdminOrganizationsPage pharmacies /> },
+        { path: '/admin/appointments', element: <AdminAppointmentsPage /> },
+        { path: '/admin/orders', element: <AdminOrdersPage /> },
+        { path: '/admin/approvals', element: <AdminApprovalsPage /> },
+        { path: '/admin/reports', element: <AdminReportsPage /> },
+        { path: '/admin/activity', element: <AdminActivityPage /> },
+        { element: <RequirePermission permission="employee.manage" />, children: [{ path: '/admin/employees', element: <AdminEmployeesPage /> }] },
+        { element: <RequirePermission permission="settings.manage" />, children: [{ path: '/admin/settings', element: <AdminSettingsPage /> }] },
       ],
     }],
   },

@@ -1,0 +1,31 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { CreateAdminEmployeePayload, CreateAdminOrganizationPayload, UpdateAdminEmployeePayload } from '@carebridge/shared';
+import { adminApi, type AdminListParams } from '@/api/admin';
+import { useCurrentUser } from './use-auth';
+
+const root = ['admin'] as const;
+const useEnabled = () => Boolean(useCurrentUser()?.roles.some((role) => ['PLATFORM_EMPLOYEE', 'PLATFORM_ADMIN', 'SUPER_ADMIN'].includes(role)));
+const useInvalidate = () => { const client = useQueryClient(); return () => client.invalidateQueries({ queryKey: root }); };
+export const useAdminOverview = () => useQuery({ queryKey: [...root, 'overview'], queryFn: adminApi.overview, enabled: useEnabled() });
+export const useAdminOrganizations = (params: Parameters<typeof adminApi.organizations>[0] = {}) => useQuery({ queryKey: [...root, 'organizations', params], queryFn: () => adminApi.organizations(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminOrganization = (id?: string) => useQuery({ queryKey: [...root, 'organizations', id], queryFn: () => adminApi.organization(id!), enabled: useEnabled() && Boolean(id) });
+export const useAdminDoctors = (params: Parameters<typeof adminApi.doctors>[0] = {}) => useQuery({ queryKey: [...root, 'doctors', params], queryFn: () => adminApi.doctors(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminDoctor = (id?: string) => useQuery({ queryKey: [...root, 'doctors', id], queryFn: () => adminApi.doctor(id!), enabled: useEnabled() && Boolean(id) });
+export const useAdminPatients = (params: Parameters<typeof adminApi.patients>[0] = {}) => useQuery({ queryKey: [...root, 'patients', params], queryFn: () => adminApi.patients(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminPatient = (id?: string) => useQuery({ queryKey: [...root, 'patients', id], queryFn: () => adminApi.patient(id!), enabled: useEnabled() && Boolean(id) });
+export const useAdminAppointments = (params: Parameters<typeof adminApi.appointments>[0] = {}) => useQuery({ queryKey: [...root, 'appointments', params], queryFn: () => adminApi.appointments(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminOrders = (params: Parameters<typeof adminApi.orders>[0] = {}) => useQuery({ queryKey: [...root, 'orders', params], queryFn: () => adminApi.orders(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminApprovals = () => useQuery({ queryKey: [...root, 'approvals'], queryFn: adminApi.approvals, enabled: useEnabled() });
+export const useAdminEmployees = (params: AdminListParams = {}) => useQuery({ queryKey: [...root, 'employees', params], queryFn: () => adminApi.employees(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminReport = (from?: string, to?: string) => useQuery({ queryKey: [...root, 'report', from, to], queryFn: () => adminApi.report(from, to), enabled: useEnabled() });
+export const useAdminActivity = (params: Parameters<typeof adminApi.activity>[0] = {}) => useQuery({ queryKey: [...root, 'activity', params], queryFn: () => adminApi.activity(params), enabled: useEnabled(), placeholderData: (old) => old });
+export const useAdminSettings = () => useQuery({ queryKey: [...root, 'settings'], queryFn: adminApi.settings, enabled: useEnabled() });
+export function useAdminAction<T>(action: (input: T) => Promise<unknown>) { const done = useInvalidate(); return useMutation({ mutationFn: action, onSuccess: done }); }
+export const useCreateAdminOrganization = () => useAdminAction((payload: CreateAdminOrganizationPayload) => adminApi.createOrganization(payload));
+export const useSetAdminOrganizationActive = () => useAdminAction(({ id, isActive }: { id: string; isActive: boolean }) => adminApi.setOrganizationActive(id, isActive));
+export const useSetAdminDoctorActive = () => useAdminAction(({ id, isActive }: { id: string; isActive: boolean }) => adminApi.setDoctorActive(id, isActive));
+export const useSetAdminUserStatus = () => useAdminAction(({ id, status }: { id: string; status: 'ACTIVE' | 'INACTIVE' }) => adminApi.setUserStatus(id, status));
+export const useDecideAdminApproval = () => useAdminAction(({ type, id, decision, reason }: { type: 'doctor' | 'organization'; id: string; decision: 'approve' | 'reject'; reason?: string }) => adminApi.decideApproval(type, id, decision, reason));
+export const useCreateAdminEmployee = () => useAdminAction((payload: CreateAdminEmployeePayload) => adminApi.createEmployee(payload));
+export const useUpdateAdminEmployee = () => useAdminAction(({ id, payload }: { id: string; payload: UpdateAdminEmployeePayload }) => adminApi.updateEmployee(id, payload));
+export const useUpdateAdminSettings = () => useAdminAction((settings: Array<{ key: string; value: string }>) => adminApi.updateSettings(settings));

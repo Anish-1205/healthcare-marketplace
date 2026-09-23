@@ -263,7 +263,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 11 | Pharmacy marketplace | ✅ Prescription → ranked pharmacy availability → choose pharmacy → server cart; live prices/stock, quantity controls, remove/clear, pharmacy-mismatch confirmation, unmatched prescription lines. TanStack Query replaces the earlier Zustand cart |
 | 12 | Orders & delivery | ✅ Checkout (saved/new address, delivery/pickup, prescription, fee breakdown, simulated payment), confirmation, patient order list/detail with timestamped tracking and cancellation; PharmacyLayout with scoped orders, prescription/stock/quantity/price review, accept/reject and preparation; simulated agent assignment and delivery progression, notifications and activity logs |
 | 13 | Clinic/hospital portal | ✅ OrganizationLayout; dashboard; scoped doctors, appointments, patients, staff, services and schedules; reports; profile management |
-| 14 | Admin portal | Overview, approvals, management, activity, charts |
+| 14 | Admin portal | ✅ Overview, approvals, management, activity, reports, settings, charts |
 | 15 | Lab tests & health records | Catalogue, booking, document vault |
 | 16 | Cross-portal integration | Notifications, reviews, favorites wiring |
 | 17 | UI polish | Loading/empty/error states, responsive, mobile nav |
@@ -300,3 +300,11 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 - Appointments and patients are derived from the same records used by the patient and doctor portals. All organization API reads and writes resolve the authenticated membership and reject cross-tenant organization IDs.
 - Reports accept a date range and summarize appointment outcomes, completed-visit revenue, daily activity and doctor performance.
 - Verification: **160/160 API tests passed across 14 files**, including 9 new organization portal integration tests; workspace typecheck passed; the web production build passed with only the existing dependency annotation and bundle-size warnings.
+
+### Phase 14 implementation and verification
+
+- Added a responsive, role-protected `AdminLayout` and `/admin/*` workspace with navigation for overview, organizations, doctors, patients, pharmacies, appointments, orders, approvals, employees, reports, activity logs and settings. Employee and settings screens also enforce their individual permissions.
+- The overview combines platform totals, pending approvals, registration and order trends, and recent registrations, appointments, orders and audit events. Reports accept a date range and summarize registrations, appointment outcomes, order volume, demo GMV, platform fees, daily activity and organization performance.
+- Platform employees can search and inspect marketplace records, review mock onboarding documents, approve or reject providers, and see platform-wide appointments, orders and activity. Platform admins can additionally create organizations, activate/deactivate accounts and providers, create/edit employees, change platform roles and update validated settings. Super-admin accounts are protected from role and status changes.
+- Replaced the provider-registration placeholder with doctor, clinic, hospital and pharmacy onboarding forms. Submissions use the existing authenticated onboarding flow, attach mock document metadata, enter pending approval and notify the review team.
+- Verification: **167/167 API tests passed across 15 files**, including 7 new admin integration tests; workspace typecheck passed; API and web production builds passed. The web build retains the existing dependency annotation and bundle-size warnings.

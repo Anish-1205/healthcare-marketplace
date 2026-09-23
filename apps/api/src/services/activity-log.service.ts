@@ -29,6 +29,11 @@ export const ACTIVITY = {
   ORDER_DELIVERED: 'order.delivered',
   LAB_BOOKING_CREATED: 'lab_booking.created',
   REVIEW_SUBMITTED: 'review.submitted',
+  USER_STATUS_UPDATED: 'admin.user_status_updated',
+  ENTITY_STATUS_UPDATED: 'admin.entity_status_updated',
+  EMPLOYEE_CREATED: 'admin.employee_created',
+  EMPLOYEE_UPDATED: 'admin.employee_updated',
+  SETTINGS_UPDATED: 'admin.settings_updated',
   DEMO_DATA_RESET: 'demo.reset',
 } as const;
 
