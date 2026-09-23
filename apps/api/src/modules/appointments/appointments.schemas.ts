@@ -32,6 +32,9 @@ export const listAppointmentsQuery = paginationQuery.extend({
   scope: z.enum(['upcoming', 'past', 'all']).default('all'),
   status: csvQuery(z.enum(APPOINTMENT_STATUSES)).optional(),
   doctorId: z.uuid().optional(),
+  patient: z.string().trim().min(1).max(120).optional(),
+  date: z.iso.date().optional(),
+  consultationType: z.enum(CONSULTATION_TYPES).optional(),
   sort: sortQuery(['scheduledStart', 'createdAt'] as const, '-scheduledStart'),
 });
 

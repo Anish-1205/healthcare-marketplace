@@ -21,7 +21,7 @@ const QUICK_ACTIONS: Partial<Record<string, Array<{ status: DoctorSettableStatus
   CHECKED_IN: [{ status: 'NO_SHOW', label: 'Mark as no-show' }],
 };
 
-export function DoctorAppointmentDetailPage() {
+export function DoctorAppointmentDetailPage({ portal = 'doctor' }: { portal?: 'doctor' | 'organization' }) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: appointment, isLoading, isError, refetch } = useAppointment(id);
@@ -44,7 +44,7 @@ export function DoctorAppointmentDetailPage() {
 
   const [firstName, ...rest] = appointment.patient.name.split(' ');
   const quickActions = QUICK_ACTIONS[appointment.status] ?? [];
-  const consultationAction =
+  const consultationAction = portal === 'organization' ? null :
     appointment.status === 'IN_CONSULTATION'
       ? 'Resume consultation'
       : appointment.consultationId
@@ -106,15 +106,15 @@ export function DoctorAppointmentDetailPage() {
       <div className="space-y-6 lg:col-span-2">
         <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <Link to={`/doctor/patients/${appointment.patient.id}`} className="flex gap-4 hover:opacity-80">
+            <div className="flex gap-4">
               <Avatar firstName={firstName} lastName={rest.join(' ')} imageUrl={appointment.patient.avatarUrl} size="lg" />
               <div>
                 <p className="flex items-center gap-1.5 text-xl font-bold text-foreground">
                   <UserIcon className="h-4.5 w-4.5 text-muted-foreground" /> {appointment.patient.name}
                 </p>
-                <p className="text-sm text-muted-foreground">View patient record</p>
+                <p className="text-sm text-muted-foreground">Patient appointment record</p>
               </div>
-            </Link>
+            </div>
             <div className="flex flex-col items-end gap-1.5">
               <AppointmentStatusBadge status={appointment.status} />
               <span className="text-xs text-muted-foreground">{appointment.appointmentNumber}</span>
@@ -291,7 +291,7 @@ export function DoctorAppointmentDetailPage() {
             </p>
           )}
 
-          <Link to="/doctor/appointments" className={buttonVariants({ variant: 'outline', size: 'sm', className: 'w-full' })}>
+          <Link to={portal === 'organization' ? '/organization/appointments' : '/doctor/appointments'} className={buttonVariants({ variant: 'outline', size: 'sm', className: 'w-full' })}>
             All appointments
           </Link>
         </div>

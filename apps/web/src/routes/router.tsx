@@ -3,6 +3,7 @@ import { CheckoutPage } from '@/pages/orders/checkout-page';
 import { OrdersPage } from '@/pages/orders/orders-page';
 import { OrderDetailPage } from '@/pages/orders/order-detail-page';
 import { PharmacyLayout } from '@/layouts/pharmacy-layout';
+import { OrganizationLayout } from '@/layouts/organization-layout';
 import { PublicLayout } from '@/layouts/public-layout';
 import { DoctorLayout } from '@/layouts/doctor-layout';
 import { RequireAuth } from '@/components/require-auth';
@@ -41,6 +42,15 @@ import { OrganizationDetailPage } from '@/pages/organizations/organization-detai
 import { OrganizationsPage } from '@/pages/organizations/organizations-page';
 import { PharmacyDetailPage } from '@/pages/pharmacies/pharmacy-detail-page';
 import { PharmaciesPage } from '@/pages/pharmacies/pharmacies-page';
+import { OrganizationDashboardPage } from '@/pages/organization/organization-dashboard-page';
+import { OrganizationDoctorsPage } from '@/pages/organization/organization-doctors-page';
+import { OrganizationAppointmentsPage } from '@/pages/organization/organization-appointments-page';
+import { OrganizationPatientsPage } from '@/pages/organization/organization-patients-page';
+import { OrganizationServicesPage } from '@/pages/organization/organization-services-page';
+import { OrganizationStaffPage } from '@/pages/organization/organization-staff-page';
+import { OrganizationSchedulesPage } from '@/pages/organization/organization-schedules-page';
+import { OrganizationReportsPage } from '@/pages/organization/organization-reports-page';
+import { OrganizationProfilePage } from '@/pages/organization/organization-profile-page';
 
 export const router = createBrowserRouter([
   {
@@ -107,6 +117,24 @@ export const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    element: <RequireRole roles={['CLINIC_ADMIN', 'CLINIC_STAFF', 'HOSPITAL_ADMIN', 'HOSPITAL_STAFF']} />,
+    children: [{
+      element: <OrganizationLayout />,
+      children: [
+        { path: '/organization', element: <OrganizationDashboardPage /> },
+        { path: '/organization/doctors', element: <OrganizationDoctorsPage /> },
+        { path: '/organization/appointments', element: <OrganizationAppointmentsPage /> },
+        { path: '/organization/appointments/:id', element: <DoctorAppointmentDetailPage portal="organization" /> },
+        { path: '/organization/patients', element: <OrganizationPatientsPage /> },
+        { path: '/organization/services', element: <OrganizationServicesPage /> },
+        { path: '/organization/staff', element: <OrganizationStaffPage /> },
+        { path: '/organization/schedules', element: <OrganizationSchedulesPage /> },
+        { path: '/organization/reports', element: <OrganizationReportsPage /> },
+        { path: '/organization/profile', element: <OrganizationProfilePage /> },
+      ],
+    }],
   },
   { element: <RequireRole roles={['PHARMACY_ADMIN', 'PHARMACY_STAFF']} />, children: [
     { element: <PharmacyLayout />, children: [

@@ -643,11 +643,32 @@ export async function listAppointments(auth: AuthContext, query: ListAppointment
         ? { OR: [{ scheduledStart: { lt: now } }, { status: { in: ['COMPLETED', 'CANCELLED', 'NO_SHOW'] } }] }
         : null;
 
+  const dateFilter: Prisma.AppointmentWhereInput | null = query.date
+    ? (() => {
+        const start = new Date(`${query.date}T00:00:00+05:30`);
+        return { scheduledStart: { gte: start, lt: new Date(start.getTime() + 86_400_000) } };
+      })()
+    : null;
+  const patientFilter: Prisma.AppointmentWhereInput | null = query.patient
+    ? {
+        AND: query.patient.split(/\s+/).map((term) => ({
+          OR: [
+            { patient: { user: { firstName: { contains: term, mode: 'insensitive' } } } },
+            { patient: { user: { lastName: { contains: term, mode: 'insensitive' } } } },
+            { patient: { user: { phone: { contains: term } } } },
+          ],
+        })),
+      }
+    : null;
+
   const where: Prisma.AppointmentWhereInput = {
     AND: [
       scopeWhere,
       ...(query.doctorId ? [{ doctorId: query.doctorId }] : []),
       ...(query.status?.length ? [{ status: { in: query.status } }] : []),
+      ...(query.consultationType ? [{ consultationType: query.consultationType }] : []),
+      ...(dateFilter ? [dateFilter] : []),
+      ...(patientFilter ? [patientFilter] : []),
       ...(scopeFilter ? [scopeFilter] : []),
     ],
   };

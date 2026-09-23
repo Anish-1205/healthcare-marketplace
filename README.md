@@ -4,7 +4,7 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 
 > **Demo only.** This is a demonstration application. Healthcare information shown here is sample data and must not be used for medical decisions. Payments, delivery, video consultation and messaging are simulated.
 
-**Status:** Phases 0–7 are complete: architecture, database, auth/RBAC, demo seed data, shared backend foundations, and the patient-facing web app foundation + marketplace (homepage, doctor/clinic/hospital/pharmacy discovery, medicine catalogue). See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+**Status:** Phases 0–13 are complete: platform foundations, patient marketplace and appointments, doctor consultations and prescriptions, pharmacy ordering and delivery, and the clinic/hospital operations portal. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Stack
 
@@ -123,7 +123,7 @@ The suite covers login for every demo account, registration, password reset, tok
 
 ## Web app
 
-`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*` is the doctor portal, behind its own layout and role guard. Not-yet-built areas (cart/checkout, orders, health records, lab tests, favorites, notifications list) show a clearly-labelled "coming soon" screen instead of a dead link or fake data — they land in Phases 11–16.
+`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*`, `/organization/*`, and `/pharmacy/*` provide role-protected workspaces for doctors, clinics/hospitals, and pharmacies. Health records, lab tests, favorites, and the patient notifications list remain clearly labelled upcoming features for later phases.
 
 - `pnpm --filter @carebridge/web dev` — dev server on 5173, proxies `/api/*` to the API on 4000
 - `pnpm --filter @carebridge/web build` — typecheck + production build

@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { ok, paginated, parse } from '../../utils/http';
 import { listOrganizationsQuery } from './organizations.schemas';
 import * as organizationsService from './organizations.service';
+import { organizationMeRouter } from './organization-me.routes';
 
 export const organizationsRouter = Router();
+
+organizationsRouter.use('/me', organizationMeRouter);
 
 organizationsRouter.get('/', async (req, res) => {
   const query = parse(listOrganizationsQuery, req.query);

@@ -11,6 +11,10 @@ export function useIsAuthenticated() {
   return useAuthStore((state) => Boolean(state.token));
 }
 
+export function useHasPermission(permission: string) {
+  return useAuthStore((state) => Boolean(state.user?.permissions.includes(permission)));
+}
+
 /** Refreshes `user` from the server (roles/permissions can change server-side). */
 export function useMe(enabled: boolean) {
   const setUser = useAuthStore((state) => state.setUser);

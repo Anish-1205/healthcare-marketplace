@@ -1,0 +1,28 @@
+import { useEffect, useState } from 'react';
+import type { UpdateOrganizationProfilePayload } from '@carebridge/shared';
+import { ApiError } from '@/api/client';
+import { ErrorState } from '@/components/error-state';
+import { PageHeader } from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useOrganizationProfile, useUpdateOrganizationProfile } from '@/hooks/use-organization-portal';
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export function OrganizationProfilePage() {
+  const query = useOrganizationProfile(); const update = useUpdateOrganizationProfile(); const [form, setForm] = useState<UpdateOrganizationProfilePayload>({}); const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => { if (query.data) setForm(query.data); }, [query.data]);
+  if (query.isLoading) return <Skeleton className="h-[32rem]" />;
+  if (query.isError || !query.data) return <ErrorState message="We couldn't load the organization profile." onRetry={() => query.refetch()} />;
+  const field = (key: keyof UpdateOrganizationProfilePayload, value: unknown) => { setForm((current) => ({ ...current, [key]: value })); setMessage(null); };
+  async function submit() { try { await update.mutateAsync(form); setMessage('Organization profile saved.'); } catch (reason) { setMessage(reason instanceof ApiError ? reason.message : 'Could not save the profile.'); } }
+  return <div><PageHeader title="Organization Profile" subtitle="Keep the public listing, contact details, address, and operating hours current." action={<Badge variant={query.data.approvalStatus === 'APPROVED' ? 'success' : 'warning'}>{query.data.approvalStatus.replace('_', ' ')}</Badge>} />
+    <div className="space-y-6 rounded-2xl border bg-card p-5 shadow-sm"><section><h2 className="mb-4 font-semibold">Public information</h2><div className="grid gap-4 sm:grid-cols-2"><div><Label>Name</Label><Input className="mt-1" value={form.name ?? ''} onChange={(e) => field('name', e.target.value)} /></div><div><Label>Category</Label><Input className="mt-1" value={form.category ?? ''} onChange={(e) => field('category', e.target.value || null)} /></div><div className="sm:col-span-2"><Label>Description</Label><textarea className="mt-1 min-h-24 w-full rounded-xl border bg-background px-3 py-2 text-sm" value={form.description ?? ''} onChange={(e) => field('description', e.target.value || null)} /></div><div><Label>Logo URL</Label><Input className="mt-1" value={form.logoUrl ?? ''} onChange={(e) => field('logoUrl', e.target.value || null)} /></div><div><Label>Website</Label><Input className="mt-1" value={form.website ?? ''} onChange={(e) => field('website', e.target.value || null)} /></div></div></section>
+      <section className="border-t pt-5"><h2 className="mb-4 font-semibold">Contact and address</h2><div className="grid gap-4 sm:grid-cols-2"><div><Label>Phone</Label><Input className="mt-1" value={form.phone ?? ''} onChange={(e) => field('phone', e.target.value || null)} /></div><div><Label>Email</Label><Input className="mt-1" type="email" value={form.email ?? ''} onChange={(e) => field('email', e.target.value || null)} /></div><div><Label>Address line 1</Label><Input className="mt-1" value={form.addressLine1 ?? ''} onChange={(e) => field('addressLine1', e.target.value || null)} /></div><div><Label>Address line 2</Label><Input className="mt-1" value={form.addressLine2 ?? ''} onChange={(e) => field('addressLine2', e.target.value || null)} /></div><div><Label>Locality</Label><Input className="mt-1" value={form.locality ?? ''} onChange={(e) => field('locality', e.target.value || null)} /></div><div><Label>City</Label><Input className="mt-1" value={form.city ?? ''} onChange={(e) => field('city', e.target.value || null)} /></div><div><Label>State</Label><Input className="mt-1" value={form.state ?? ''} onChange={(e) => field('state', e.target.value || null)} /></div><div><Label>Postal code</Label><Input className="mt-1" value={form.postalCode ?? ''} onChange={(e) => field('postalCode', e.target.value || null)} /></div></div></section>
+      <section className="border-t pt-5"><h2 className="mb-4 font-semibold">Operating hours</h2><label className="mb-4 flex items-center gap-2 text-sm"><input type="checkbox" checked={form.is24Hours ?? false} onChange={(e) => field('is24Hours', e.target.checked)} /> Open 24 hours</label>{!form.is24Hours && <div className="mb-4 flex gap-3"><div><Label>Opens</Label><Input className="mt-1" type="time" value={form.opensAt ?? ''} onChange={(e) => field('opensAt', e.target.value || null)} /></div><div><Label>Closes</Label><Input className="mt-1" type="time" value={form.closesAt ?? ''} onChange={(e) => field('closesAt', e.target.value || null)} /></div></div>}<div className="flex flex-wrap gap-2">{DAYS.map((day, index) => { const selected = form.openDays?.includes(index); return <button type="button" key={day} onClick={() => field('openDays', selected ? form.openDays?.filter((value) => value !== index) : [...(form.openDays ?? []), index])} className={`rounded-full border px-3 py-1 text-sm font-medium ${selected ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>{day}</button>; })}</div></section>
+      {message && <p className={`rounded-xl px-3 py-2 text-sm ${message.endsWith('saved.') ? 'bg-emerald-50 text-emerald-700' : 'bg-destructive/10 text-destructive'}`}>{message}</p>}<Button disabled={update.isPending} onClick={submit}>{update.isPending ? 'Saving…' : 'Save profile'}</Button>
+    </div>
+  </div>;
+}

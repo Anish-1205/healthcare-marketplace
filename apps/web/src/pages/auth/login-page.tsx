@@ -28,7 +28,7 @@ export function LoginPage() {
     setServerError(null);
     try {
       const { user } = await login.mutateAsync(values);
-      const portalHome = user.portal === 'doctor' ? '/doctor' : user.portal === 'pharmacy' ? '/pharmacy' : '/';
+      const portalHome = user.portal === 'doctor' ? '/doctor' : user.portal === 'organization' ? '/organization' : user.portal === 'pharmacy' ? '/pharmacy' : '/';
       const redirectTo = (location.state as { from?: string } | null)?.from ?? portalHome;
       navigate(redirectTo, { replace: true });
     } catch (error) {

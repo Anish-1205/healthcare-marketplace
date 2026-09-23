@@ -143,7 +143,7 @@ All responses use `{ success, data, meta? }` or `{ success: false, error: { code
 | Patients | `GET/PATCH /patients/me` · `GET/POST/PATCH/DELETE /patients/me/addresses` |
 | Doctors | ✅ `GET /doctors` (filters: q, specialty, organizationId, type, feeMax, minRating, language, locality; sort: rating/fee/experience/name) · ✅ `GET /doctors/:id` (id or slug) · ✅ `GET /doctors/:id/slots?date=` (real availability minus booked/blocked) |
 | Doctor self | ✅ `GET/PATCH /doctors/me` · ✅ `GET/PUT /doctors/me/availability` · ✅ `POST/DELETE /doctors/me/blocked-dates` · ✅ `GET /doctors/me/dashboard` · ✅ `GET /doctors/me/patients` · ✅ `GET /doctors/me/patients/:id` |
-| Organizations | ✅ `GET /organizations` (type csv, locality, specialty, q) · ✅ `GET /organizations/:id` (id or slug; services, doctors, reviews, open/closed status) · `GET/PATCH /organizations/me/*` (profile, doctors, staff, services, schedules, dashboard, reports) |
+| Organizations | ✅ `GET /organizations` (type csv, locality, specialty, q) · ✅ `GET /organizations/:id` (id or slug; services, doctors, reviews, open/closed status) · ✅ `GET/PATCH/POST/PUT /organizations/me/*` (profile, doctors, staff, services, schedules, dashboard, reports) |
 | Appointments | ✅ `POST /appointments` · ✅ `GET /appointments` (scoped by role) · ✅ `GET /appointments/:id` · ✅ `POST /appointments/:id/cancel` · ✅ `POST /appointments/:id/reschedule` · ✅ `POST /appointments/:id/status` (confirm/check-in/no-show) |
 | Consultations | ✅ `POST /appointments/:id/consultation` (start / re-open) · ✅ `GET /consultations` · ✅ `GET/PATCH /consultations/:id` · ✅ `POST /consultations/:id/complete` |
 | Prescriptions | ✅ `POST /prescriptions` · ✅ `PATCH /prescriptions/:id` · ✅ `POST /prescriptions/:id/issue` · ✅ `GET /prescriptions` · ✅ `GET /prescriptions/:id` · ✅ `GET /prescriptions/:id/pharmacies` (ranked availability) |
@@ -262,7 +262,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 10 | Consultations & prescriptions | ✅ Consultation workspace (patient context, previous consultations/prescriptions, hand-typed notes/diagnosis/observations/follow-up), prescription builder over the medicine catalogue, draft → issue, printable prescription sheet for doctor and patient, patient prescription list/detail. Completing a visit closes the appointment, issues a leftover draft and settles a pay-at-clinic fee |
 | 11 | Pharmacy marketplace | ✅ Prescription → ranked pharmacy availability → choose pharmacy → server cart; live prices/stock, quantity controls, remove/clear, pharmacy-mismatch confirmation, unmatched prescription lines. TanStack Query replaces the earlier Zustand cart |
 | 12 | Orders & delivery | ✅ Checkout (saved/new address, delivery/pickup, prescription, fee breakdown, simulated payment), confirmation, patient order list/detail with timestamped tracking and cancellation; PharmacyLayout with scoped orders, prescription/stock/quantity/price review, accept/reject and preparation; simulated agent assignment and delivery progression, notifications and activity logs |
-| 13 | Clinic/hospital portal | Dashboard, doctors, staff, schedules, reports |
+| 13 | Clinic/hospital portal | ✅ OrganizationLayout; dashboard; scoped doctors, appointments, patients, staff, services and schedules; reports; profile management |
 | 14 | Admin portal | Overview, approvals, management, activity, charts |
 | 15 | Lab tests & health records | Catalogue, booking, document vault |
 | 16 | Cross-portal integration | Notifications, reviews, favorites wiring |
@@ -290,4 +290,13 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 - Existing Prisma models were sufficient; **no schema change or migration** was needed. Delivery addresses are snapshotted; entering an address at checkout does not add it to the address book. Prescription-only medicines require a matching issued prescription belonging to the patient.
 - Browser verification used installed Chrome and temporary API/frontend servers on ports 4001/5174 against `carebridge_test`: cart → checkout → confirmation → pharmacy confirmation/preparation → agent assignment → pickup → on the way → delivered → patient tracking. Desktop and 390px mobile passed with no browser/API errors. Fixed the shared mobile header overflowing by 7px.
 - Focused coverage includes totals, stock rollback, concurrent checkout, address ownership, prescription review, full delivery and pickup chains, invalid transitions, partial approvals (including omitted lines), cancellation cutoff/refund, rejection, patient/pharmacy isolation, and duplicate-payment prevention.
-- **Phase 13 is not started.** Real payment/refund gateways and logistics remain deliberately out of scope. New runtime UI status labels live in the web app; shared order additions are type-only DTOs.
+- Real payment/refund gateways and logistics remain deliberately out of scope. New runtime UI status labels live in the web app; shared order additions are type-only DTOs.
+
+### Phase 13 implementation and verification
+
+- Added a responsive `OrganizationLayout` and role-protected `/organization/*` portal for clinic and hospital accounts. Login now takes organization users directly to their portal.
+- The dashboard shows today's appointments, active doctors, total patients, completed consultations, lifetime completed-visit revenue, a seven-day appointment trend and today's doctor availability.
+- Organization admins can update the public profile and operating hours; associate and activate/deactivate doctors; override consultation fees; add/deactivate staff; manage services; and replace each doctor's organization-specific weekly schedule. Staff retain read access to operations and appointment actions under the existing RBAC matrix.
+- Appointments and patients are derived from the same records used by the patient and doctor portals. All organization API reads and writes resolve the authenticated membership and reject cross-tenant organization IDs.
+- Reports accept a date range and summarize appointment outcomes, completed-visit revenue, daily activity and doctor performance.
+- Verification: **160/160 API tests passed across 14 files**, including 9 new organization portal integration tests; workspace typecheck passed; the web production build passed with only the existing dependency annotation and bundle-size warnings.

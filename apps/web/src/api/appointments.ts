@@ -16,6 +16,9 @@ export interface ListAppointmentsParams {
   scope?: AppointmentScope;
   status?: AppointmentStatus[];
   doctorId?: string;
+  patient?: string;
+  date?: string;
+  consultationType?: import('@carebridge/shared').ConsultationType;
   sort?: string;
 }
 
