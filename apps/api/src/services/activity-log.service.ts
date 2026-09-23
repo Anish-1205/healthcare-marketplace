@@ -22,6 +22,7 @@ export const ACTIVITY = {
   CONSULTATION_COMPLETED: 'consultation.completed',
   PRESCRIPTION_ISSUED: 'prescription.issued',
   ORDER_CREATED: 'order.created',
+  ORDER_STATUS_UPDATED: 'order.status_updated',
   ORDER_ACCEPTED: 'order.accepted',
   ORDER_REJECTED: 'order.rejected',
   ORDER_DISPATCHED: 'order.dispatched',

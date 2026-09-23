@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { GlobalSearch } from '@/components/global-search';
 import { Logo } from '@/components/logo';
 import { useCurrentUser, useLogout } from '@/hooks/use-auth';
-import { useCartCount } from '@/store/cart-store';
+import { useCartCount } from '@/hooks/use-cart';
 import { useUnreadNotificationCount } from '@/hooks/use-notifications';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +38,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-white/95 backdrop-blur">
-      <div className="container flex h-16 items-center gap-4">
+      <div className="container flex h-16 items-center gap-1 sm:gap-4">
         <button className="rounded-lg p-2 hover:bg-accent lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </button>

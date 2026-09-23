@@ -1,30 +1,33 @@
 import type { MedicineSummary } from '@carebridge/shared';
-import { Minus, Pill, Plus } from 'lucide-react';
+import { Pill } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useCartStore } from '@/store/cart-store';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { QuantityStepper } from '@/components/quantity-stepper';
+import { useAddToCart } from '@/hooks/use-add-to-cart';
+import { useCart, useRemoveCartItem, useUpdateCartItem } from '@/hooks/use-cart';
 import { cn, formatCurrency } from '@/lib/utils';
 
-export function MedicineCard({ medicine, className }: { medicine: MedicineSummary; className?: string }) {
-  const lines = useCartStore((s) => s.lines);
-  const addItem = useCartStore((s) => s.addItem);
-  const updateQuantity = useCartStore((s) => s.updateQuantity);
-  const line = lines.find((l) => l.medicineId === medicine.id);
+/**
+ * A cart is bound to one pharmacy (see `cart.service.ts`), so this card only offers a direct
+ * Add/quantity control when it already knows which pharmacy it's shopping for (`pharmacyId` —
+ * set on a pharmacy's own page, or the "shop this pharmacy" filter). Otherwise — the generic
+ * catalogue browse, where the price shown is the best across pharmacies — it sends the shopper
+ * to the medicine page to pick a pharmacy, per-offer, themselves.
+ */
+export function MedicineCard({ medicine, pharmacyId, className }: { medicine: MedicineSummary; pharmacyId?: string; className?: string }) {
+  const { data: cart } = useCart();
+  const { addToCart, isPending, conflict, cancelConflict, error } = useAddToCart();
+  const updateItem = useUpdateCartItem();
+  const removeItem = useRemoveCartItem();
+
+  const cartLine = pharmacyId && cart?.pharmacy?.id === pharmacyId ? cart.items.find((item) => item.medicineId === medicine.id) : undefined;
   const outOfStock = medicine.inStockPharmacyCount === 0;
   const price = medicine.bestPrice ?? medicine.mrp;
 
-  function handleAdd() {
-    // Demo cart: the first pharmacy carrying the item is used as a placeholder until a pharmacy is chosen at checkout.
-    addItem('unassigned', 'Choose at checkout', {
-      medicineId: medicine.id,
-      name: medicine.name,
-      imageUrl: medicine.imageUrl,
-      packSize: medicine.packSize,
-      requiresPrescription: medicine.requiresPrescription,
-      unitPrice: price,
-      mrp: medicine.mrp,
-    });
+  function handleQuantityChange(next: number) {
+    if (next <= 0) removeItem.mutate(medicine.id);
+    else updateItem.mutate({ medicineId: medicine.id, quantity: next });
   }
 
   return (
@@ -68,22 +71,33 @@ export function MedicineCard({ medicine, className }: { medicine: MedicineSummar
           <Button size="sm" variant="outline" disabled className="w-full">
             Out of Stock
           </Button>
-        ) : line ? (
-          <div className="flex items-center justify-between rounded-full bg-primary px-1 py-1">
-            <button onClick={() => updateQuantity(medicine.id, line.quantity - 1)} className="flex h-8 w-8 items-center justify-center rounded-full text-primary-foreground hover:bg-white/10" aria-label="Decrease quantity">
-              <Minus className="h-4 w-4" />
-            </button>
-            <span className="text-sm font-semibold text-primary-foreground">{line.quantity}</span>
-            <button onClick={() => updateQuantity(medicine.id, line.quantity + 1)} className="flex h-8 w-8 items-center justify-center rounded-full text-primary-foreground hover:bg-white/10" aria-label="Increase quantity">
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
+        ) : !pharmacyId ? (
+          <Link to={`/medicines/${medicine.slug}`} className={buttonVariants({ size: 'sm', variant: 'outline', className: 'w-full' })}>
+            Compare Pharmacies
+          </Link>
+        ) : cartLine ? (
+          <QuantityStepper quantity={cartLine.quantity} onChange={handleQuantityChange} disabled={updateItem.isPending || removeItem.isPending} />
         ) : (
-          <Button size="sm" className="w-full" onClick={handleAdd}>
+          <Button size="sm" className="w-full" disabled={isPending} onClick={() => addToCart({ medicineId: medicine.id, pharmacyId, quantity: 1 })}>
             Add
           </Button>
         )}
       </div>
+
+      {conflict && (
+        <div className="mt-2 rounded-xl bg-amber-50 p-2.5 text-xs text-amber-900">
+          <p>{conflict.message}</p>
+          <div className="mt-1.5 flex gap-3">
+            <button onClick={conflict.confirm} className="font-semibold underline">
+              Replace cart
+            </button>
+            <button onClick={cancelConflict} className="text-amber-700">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
     </div>
   );
 }

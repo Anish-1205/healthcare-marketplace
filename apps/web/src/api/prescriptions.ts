@@ -1,6 +1,7 @@
 import type {
   CreatePrescriptionPayload,
   PrescriptionDetail,
+  PrescriptionPharmacyMatch,
   PrescriptionStatus,
   PrescriptionSummary,
   UpdatePrescriptionPayload,
@@ -22,4 +23,5 @@ export const prescriptionsApi = {
   create: (payload: CreatePrescriptionPayload) => api.post<PrescriptionDetail>('/prescriptions', payload),
   update: (id: string, payload: UpdatePrescriptionPayload) => api.patch<PrescriptionDetail>(`/prescriptions/${id}`, payload),
   issue: (id: string) => api.post<PrescriptionDetail>(`/prescriptions/${id}/issue`),
+  pharmacies: (id: string) => api.get<PrescriptionPharmacyMatch[]>(`/prescriptions/${id}/pharmacies`),
 };

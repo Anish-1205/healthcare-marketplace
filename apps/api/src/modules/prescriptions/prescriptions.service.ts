@@ -2,9 +2,11 @@ import type { Prisma } from '@prisma/client';
 import {
   PRESCRIPTION_VALIDITY_DAYS,
   type PrescriptionDetail,
+  type PrescriptionPharmacyMatch,
   type PrescriptionSummary,
 } from '@carebridge/shared';
 import { prisma, type Tx } from '../../config/prisma';
+import { openStatus, listed as listedOrganization } from '../organizations/organizations.service';
 import { ACTIVITY, logActivity } from '../../services/activity-log.service';
 import { notify } from '../../services/notification.service';
 import { canAccessOrganization } from '../../services/tenant.service';
@@ -304,4 +306,81 @@ export async function listPrescriptions(auth: AuthContext, query: ListPrescripti
   ]);
 
   return { data: rows.map(toPrescriptionSummary), total };
+}
+
+/**
+ * Pharmacies that can fulfil an issued prescription, for the "choose a pharmacy" step. Only
+ * items the doctor picked from the medicine catalogue (`medicineId` set) can be matched against
+ * inventory — a hand-typed medicine name can never be confirmed in stock anywhere, so a
+ * prescription containing one is never reported as fully matched.
+ */
+export async function getPrescriptionPharmacies(auth: AuthContext, id: string): Promise<PrescriptionPharmacyMatch[]> {
+  const prescription = await findOrThrow(id);
+  if (!canView(auth, prescription)) throw forbidden('You do not have access to this prescription.', 'PRESCRIPTION_ACCESS_DENIED');
+  if (prescription.status !== 'ISSUED') throw conflict('PRESCRIPTION_NOT_ISSUED', 'Only issued prescriptions can be ordered.');
+
+  const quantityByMedicine = new Map<string, number>();
+  for (const item of prescription.items) {
+    if (!item.medicineId) continue;
+    quantityByMedicine.set(item.medicineId, (quantityByMedicine.get(item.medicineId) ?? 0) + item.quantity);
+  }
+  const medicineIds = [...quantityByMedicine.keys()];
+  const totalItemCount = prescription.items.length;
+
+  const pharmacies = await prisma.organization.findMany({
+    where: { ...listedOrganization, type: 'PHARMACY', acceptsPrescriptions: true },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      logoUrl: true,
+      locality: true,
+      avgRating: true,
+      reviewCount: true,
+      is24Hours: true,
+      opensAt: true,
+      closesAt: true,
+      openDays: true,
+      deliveryAvailable: true,
+      pickupAvailable: true,
+      deliveryEtaMinMinutes: true,
+      deliveryEtaMaxMinutes: true,
+      inventory: medicineIds.length
+        ? { where: { medicineId: { in: medicineIds }, isActive: true, stockQuantity: { gt: 0 } }, select: { medicineId: true, sellingPrice: true } }
+        : false,
+    },
+  });
+
+  const now = new Date();
+  const matches: PrescriptionPharmacyMatch[] = pharmacies.map((pharmacy) => {
+    const inventory = pharmacy.inventory ?? [];
+    const { isOpenNow, hoursLabel } = openStatus(pharmacy, now);
+    return {
+      pharmacy: {
+        id: pharmacy.id,
+        slug: pharmacy.slug,
+        name: pharmacy.name,
+        logoUrl: pharmacy.logoUrl,
+        locality: pharmacy.locality,
+        avgRating: Number(pharmacy.avgRating),
+        reviewCount: pharmacy.reviewCount,
+        isOpenNow,
+        hoursLabel,
+        deliveryAvailable: pharmacy.deliveryAvailable,
+        pickupAvailable: pharmacy.pickupAvailable,
+        deliveryEtaMinMinutes: pharmacy.deliveryEtaMinMinutes,
+        deliveryEtaMaxMinutes: pharmacy.deliveryEtaMaxMinutes,
+      },
+      matchedItemCount: prescription.items.filter((item) => inventory.some((row) => row.medicineId === item.medicineId)).length,
+      totalItemCount,
+      estimatedTotal: inventory.reduce((sum, row) => sum + Number(row.sellingPrice) * (quantityByMedicine.get(row.medicineId) ?? 0), 0),
+      hasAllItems: prescription.items.every((item) => inventory.some((row) => row.medicineId === item.medicineId)),
+    };
+  });
+
+  return matches.sort((a, b) => {
+    if (a.hasAllItems !== b.hasAllItems) return a.hasAllItems ? -1 : 1;
+    if (a.matchedItemCount !== b.matchedItemCount) return b.matchedItemCount - a.matchedItemCount;
+    return b.pharmacy.avgRating - a.pharmacy.avgRating;
+  });
 }

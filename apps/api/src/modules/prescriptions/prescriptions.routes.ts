@@ -44,3 +44,8 @@ prescriptionsRouter.post('/:id/issue', canWrite, async (req, res) => {
   const { id } = parse(uuidParam, req.params);
   ok(res, await prescriptionsService.issuePrescription(getAuth(req), id, req.ip));
 });
+
+prescriptionsRouter.get('/:id/pharmacies', canRead, async (req, res) => {
+  const { id } = parse(uuidParam, req.params);
+  ok(res, await prescriptionsService.getPrescriptionPharmacies(getAuth(req), id));
+});

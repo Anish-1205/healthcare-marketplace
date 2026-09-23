@@ -9,7 +9,7 @@ import { RatingStars } from '@/components/rating-stars';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMedicines } from '@/hooks/use-medicines';
 import { usePharmacy } from '@/hooks/use-pharmacies';
-import { useCartStore } from '@/store/cart-store';
+import { useCart } from '@/hooks/use-cart';
 import { avatarHue, formatDistance } from '@/lib/utils';
 
 export function PharmacyDetailPage() {
@@ -17,8 +17,7 @@ export function PharmacyDetailPage() {
   const navigate = useNavigate();
   const { data: pharmacy, isLoading, isError, refetch } = usePharmacy(id);
   const medicines = useMedicines({ pharmacyId: pharmacy?.id, pageSize: 12 });
-  const cartPharmacyId = useCartStore((s) => s.pharmacyId);
-  const clearCart = useCartStore((s) => s.clear);
+  const { data: cart } = useCart();
 
   if (isLoading) {
     return (
@@ -36,10 +35,11 @@ export function PharmacyDetailPage() {
   }
 
   const hue = avatarHue(pharmacy.name);
-  const isSelected = cartPharmacyId === pharmacy.id;
+  const isSelected = cart?.pharmacy?.id === pharmacy.id;
 
   function selectPharmacy() {
-    if (cartPharmacyId && cartPharmacyId !== pharmacy!.id) clearCart();
+    // Browsing here doesn't touch the cart — a mismatch is only ever resolved (with confirmation)
+    // at the moment something is actually added, in `useAddToCart`.
     navigate(`/medicines?pharmacyId=${pharmacy!.id}`);
   }
 
@@ -112,7 +112,7 @@ export function PharmacyDetailPage() {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {medicines.data.data.map((medicine) => (
-              <MedicineCard key={medicine.id} medicine={medicine} />
+              <MedicineCard key={medicine.id} medicine={medicine} pharmacyId={pharmacy.id} />
             ))}
           </div>
         )}

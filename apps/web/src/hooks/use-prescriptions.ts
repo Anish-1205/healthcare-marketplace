@@ -22,6 +22,16 @@ export function usePrescription(id: string | undefined) {
   });
 }
 
+/** Pharmacies able to fulfil an issued prescription, for the "choose a pharmacy" step. */
+export function usePrescriptionPharmacies(id: string | undefined) {
+  const isAuthenticated = useIsAuthenticated();
+  return useQuery({
+    queryKey: ['prescriptions', 'pharmacies', id],
+    queryFn: () => prescriptionsApi.pharmacies(id!),
+    enabled: isAuthenticated && Boolean(id),
+  });
+}
+
 function usePrescriptionMutation<TVariables, TResult>(mutationFn: (variables: TVariables) => Promise<TResult>) {
   const queryClient = useQueryClient();
   return useMutation({

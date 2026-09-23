@@ -43,6 +43,9 @@ CareBridge is a **sales demo** of a multi-tenant healthcare marketplace. It conn
 | Clinical text | Stored verbatim; the API never generates or suggests diagnosis, dosage, frequency or timing | Required by the brief. The builder offers typing shortcuts only. |
 | Draft prescriptions | Numbered on creation, visible only to their author until issued | `prescriptionNumber` is unique and non-null in the schema, and a draft is not yet a document the patient holds. |
 | Patient history in the workspace | The treating doctor sees the patient's earlier consultations and issued prescriptions, including other doctors' | That context is the point of the visit. Consent-based gating is a production item. |
+| Checkout inventory | Reserve stock, snapshot prices/address, create the order/payment, and clear the cart in one transaction | Conditional stock updates prevent overselling; a cart row lock prevents duplicate checkout. Cancellation/rejection returns reserved quantities. |
+| Pharmacy review | Require prescription review for prescription orders; allow lower prices and approved quantities (including zero for omitted lines) | Never increase what the patient agreed to pay. At least one medicine must remain; otherwise reject. Demo payment amounts reconcile to the approved total. |
+| Fulfillment progression | Pending → review when needed → confirmed → preparing → ready; pickup completes there, delivery requires assigned → picked up → on the way → delivered | Prevent skipped states. Delivery pickup marks the order out for delivery; delivery completion settles cash and closes the order. Cancellation ends when preparation begins. |
 
 ---
 
@@ -57,9 +60,10 @@ CareBridge is a **sales demo** of a multi-tenant healthcare marketplace. It conn
 | `organizations` | ✅ Clinic/hospital/pharmacy discovery, profile, doctors, services, open/closed status | 7 ✅ (self-service mgmt in 13) |
 | `appointments` | ✅ Book (simulated payment), cancel, reschedule, history, role-scoped reads | 8 ✅ (doctor status actions in 9) |
 | `consultations` | ✅ Start from an appointment, workspace notes / diagnosis / observations / follow-up (all hand-typed), complete | 10 ✅ |
-| `prescriptions` | ✅ Draft → issue, hand-typed dosage lines, role-scoped reads, print view | 10 ✅ |
-| `medicines` / `pharmacies` / `inventory` | ✅ Catalogue browse, categories, pharmacy price/stock, "shop this pharmacy" (cart/checkout is 11–12) | 7 ✅ (ordering in 11) |
-| `cart` / `orders` / `payments` / `deliveries` | Checkout, order lifecycle, simulated payment and delivery | 12 |
+| `prescriptions` | ✅ Draft → issue, hand-typed dosage lines, role-scoped reads, print view, ranked pharmacy availability | 10 ✅, 11 ✅ |
+| `medicines` / `pharmacies` / `inventory` | ✅ Catalogue browse, categories, pharmacy price/stock, "shop this pharmacy", pharmacy-specific add-to-cart | 7 ✅, 11 ✅ |
+| `cart` | ✅ Patient server cart, live prices/stock, quantity updates/removal/clear, confirmed pharmacy replacement, prescription-to-cart with unmatched lines | 11 ✅ |
+| `orders` / `payments` / `deliveries` | ✅ Transactional checkout, scoped order lists/details, pharmacy review/quantity/price confirmation, status history, cancellation/refund, simulated payments and delivery | 12 ✅ |
 | `notifications` | In-app notifications (service + list / unread count / mark read) | 5 ✅ (events wired in 8–12) |
 | `search` / `reference` | Universal header search; specialties, medicine categories, public config | 5 ✅ |
 | `reviews` / `favorites` | Ratings (with moderation) and saved providers | 7, 16 |
@@ -142,12 +146,13 @@ All responses use `{ success, data, meta? }` or `{ success: false, error: { code
 | Organizations | ✅ `GET /organizations` (type csv, locality, specialty, q) · ✅ `GET /organizations/:id` (id or slug; services, doctors, reviews, open/closed status) · `GET/PATCH /organizations/me/*` (profile, doctors, staff, services, schedules, dashboard, reports) |
 | Appointments | ✅ `POST /appointments` · ✅ `GET /appointments` (scoped by role) · ✅ `GET /appointments/:id` · ✅ `POST /appointments/:id/cancel` · ✅ `POST /appointments/:id/reschedule` · ✅ `POST /appointments/:id/status` (confirm/check-in/no-show) |
 | Consultations | ✅ `POST /appointments/:id/consultation` (start / re-open) · ✅ `GET /consultations` · ✅ `GET/PATCH /consultations/:id` · ✅ `POST /consultations/:id/complete` |
-| Prescriptions | ✅ `POST /prescriptions` · ✅ `PATCH /prescriptions/:id` · ✅ `POST /prescriptions/:id/issue` · ✅ `GET /prescriptions` · ✅ `GET /prescriptions/:id` · `GET /prescriptions/:id/pharmacies` (availability — 11) |
+| Prescriptions | ✅ `POST /prescriptions` · ✅ `PATCH /prescriptions/:id` · ✅ `POST /prescriptions/:id/issue` · ✅ `GET /prescriptions` · ✅ `GET /prescriptions/:id` · ✅ `GET /prescriptions/:id/pharmacies` (ranked availability) |
 | Medicines | ✅ `GET /medicines` (q, category, requiresPrescription, pharmacyId — "shop this pharmacy"; sort: name/mrp) · ✅ `GET /medicines/:id` (pharmacy offers, cheapest first) |
 | Pharmacies | ✅ `GET /pharmacies` (an Organization of type PHARMACY; locality, deliveryAvailable, acceptsPrescriptions) · ✅ `GET /pharmacies/:id` · `GET/PATCH /pharmacies/me/*` (profile, settings, inventory, orders, deliveries, customers, reports, dashboard) |
-| Cart & orders | `GET/PUT /cart` · `POST /orders` · `GET /orders` · `GET /orders/:id` · `POST /orders/:id/status` · `POST /orders/:id/cancel` |
-| Payments | `POST /payments/simulate` · `GET /payments` |
-| Deliveries | `POST /orders/:id/delivery` (assign simulated agent) · `POST /deliveries/:id/status` |
+| Cart | ✅ `GET /cart` · ✅ `POST /cart/items` · ✅ `PATCH /cart/items/:medicineId` · ✅ `DELETE /cart/items/:medicineId` · ✅ `DELETE /cart` · ✅ `POST /cart/from-prescription` |
+| Orders | ✅ `GET /orders/checkout` (cart, saved addresses, configured platform fee) · ✅ `POST /orders` (checkout) · ✅ `GET /orders` (role-scoped, status filter, pagination) · ✅ `GET /orders/:id` · ✅ `POST /orders/:id/status` (pharmacy review/approved quantities/prices and progression) · ✅ `POST /orders/:id/cancel` (own order, before preparation) |
+| Payments | ✅ `POST /payments/simulate` (existing order payment, patient-owned, idempotent; cash settles on completion) · ✅ `GET /payments` (patient/platform scope, pagination) |
+| Deliveries | ✅ `POST /orders/:id/delivery` (assign simulated agent to a ready delivery order) · ✅ `POST /deliveries/:id/status` (strict progression; synchronizes order history/status) |
 | Engagement | `GET/POST /reviews` · `GET/POST/DELETE /favorites` |
 | Labs & records | `GET /labs/tests` · `GET /labs/tests/:id` · `POST /labs/bookings` · `GET /labs/bookings` · `GET/POST/DELETE /health-records/documents` · `GET /health-records/summary` |
 | Admin | `GET /admin/overview` · `GET /admin/{organizations,doctors,patients,pharmacies,appointments,orders,employees,activity}` · `POST /admin/approvals/:type/:id/{approve,reject}` · `PATCH /admin/users/:id/status` · `POST/PATCH /admin/employees` · `GET/PATCH /admin/settings` · `GET /admin/reports/*` |
@@ -255,8 +260,8 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 8 | Appointments | ✅ Booking API (slot re-validation, partial unique index against double-booking, simulated payment, notifications, activity log, status history), patient booking page, appointment list + detail with timeline, cancel (with refund) and reschedule |
 | 9 | Doctor portal | ✅ `DoctorLayout` (sidebar, pending-approval banner), dashboard (stat tiles, today's schedule, upcoming, recent patients), appointments list + detail with confirm/check-in/no-show/cancel/reschedule, patients list + detail (visit history), weekly availability editor (per clinic, breaks, slot length) + blocked dates, profile self-service (bio, specialties, fee, languages, consultation types, photo URL), notifications, login now routes doctors straight into the portal |
 | 10 | Consultations & prescriptions | ✅ Consultation workspace (patient context, previous consultations/prescriptions, hand-typed notes/diagnosis/observations/follow-up), prescription builder over the medicine catalogue, draft → issue, printable prescription sheet for doctor and patient, patient prescription list/detail. Completing a visit closes the appointment, issues a leftover draft and settles a pay-at-clinic fee |
-| 11 | Pharmacy marketplace | Prescription → pharmacy availability, cart |
-| 12 | Orders & delivery | Checkout, pharmacy processing, tracking |
+| 11 | Pharmacy marketplace | ✅ Prescription → ranked pharmacy availability → choose pharmacy → server cart; live prices/stock, quantity controls, remove/clear, pharmacy-mismatch confirmation, unmatched prescription lines. TanStack Query replaces the earlier Zustand cart |
+| 12 | Orders & delivery | ✅ Checkout (saved/new address, delivery/pickup, prescription, fee breakdown, simulated payment), confirmation, patient order list/detail with timestamped tracking and cancellation; PharmacyLayout with scoped orders, prescription/stock/quantity/price review, accept/reject and preparation; simulated agent assignment and delivery progression, notifications and activity logs |
 | 13 | Clinic/hospital portal | Dashboard, doctors, staff, schedules, reports |
 | 14 | Admin portal | Overview, approvals, management, activity, charts |
 | 15 | Lab tests & health records | Catalogue, booking, document vault |
@@ -265,3 +270,24 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 18 | Testing | Booking, prescriptions, orders, tenant isolation, status progression |
 | 19 | Documentation | README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS |
 | 20 | Full demo verification | Golden flow end-to-end in the browser |
+
+### Phase 11 verification
+
+- Cart integration suite: **12/12 passed** against `carebridge_test`; full API suite: **135/135 passed across 12 files**, including all 123 earlier tests.
+- Workspace `pnpm -r typecheck` and `pnpm -r build`: **passed**. PostgreSQL container `carebridge-postgres` is healthy on port 5433. Build/test commands ran outside the Windows sandbox after filesystem/Docker access restrictions.
+- Fixed: adding to an emptied cart failed to restore its pharmacy, bypassing mismatch confirmation; repeated prescription medicine lines were undercounted in matching and could exceed stock when merged into the cart. Regression coverage also checks prescription ownership and draft rejection.
+- Patient route: `/prescriptions/:id/pharmacies` leads to `/cart`. Shared cart additions are types only; no CommonJS runtime-export build error occurred.
+- Non-blocking build warnings remain for dependency annotations and bundle size. Browser walkthrough was not performed in this verification pass.
+- At the Phase 11 checkpoint, Proceed to Checkout was intentionally disabled. Phase 12 below enables it.
+
+### Phase 12 implementation and verification
+
+- Final API suite: **151/151 passed across 13 files**, including **16/16 new order tests** and all 135 prior tests. Tests actually ran against the separate PostgreSQL `carebridge_test` database; Docker container `carebridge-postgres` was reachable and healthy on port 5433.
+- Final workspace `pnpm -r typecheck` and `pnpm -r build`: **passed**. No CommonJS runtime-export errors occurred. Only non-blocking dependency annotation and bundle-size warnings remain.
+- Patient routes: `/checkout`, `/orders`, `/orders/:id`; checkout navigates to an order confirmation and tracking screen. The cart checkout button is enabled when stock is available.
+- Pharmacy routes: `/pharmacy` → `/pharmacy/orders`, `/pharmacy/orders/:id`. Pharmacy login now opens its portal. Order processing and delivery controls share the order detail screen; broader inventory/profile/reporting features are not part of this phase.
+- Payments remain entirely simulated. The previously planned payment routes did not exist at the start of Phase 12; order checkout follows the appointment payment pattern. Online demo payments are marked paid, cash settles on delivery/pickup, and cancellation/rejection marks paid payments refunded.
+- Existing Prisma models were sufficient; **no schema change or migration** was needed. Delivery addresses are snapshotted; entering an address at checkout does not add it to the address book. Prescription-only medicines require a matching issued prescription belonging to the patient.
+- Browser verification used installed Chrome and temporary API/frontend servers on ports 4001/5174 against `carebridge_test`: cart → checkout → confirmation → pharmacy confirmation/preparation → agent assignment → pickup → on the way → delivered → patient tracking. Desktop and 390px mobile passed with no browser/API errors. Fixed the shared mobile header overflowing by 7px.
+- Focused coverage includes totals, stock rollback, concurrent checkout, address ownership, prescription review, full delivery and pickup chains, invalid transitions, partial approvals (including omitted lines), cancellation cutoff/refund, rejection, patient/pharmacy isolation, and duplicate-payment prevention.
+- **Phase 13 is not started.** Real payment/refund gateways and logistics remain deliberately out of scope. New runtime UI status labels live in the web app; shared order additions are type-only DTOs.

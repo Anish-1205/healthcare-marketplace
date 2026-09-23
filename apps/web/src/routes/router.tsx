@@ -1,4 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { CheckoutPage } from '@/pages/orders/checkout-page';
+import { OrdersPage } from '@/pages/orders/orders-page';
+import { OrderDetailPage } from '@/pages/orders/order-detail-page';
+import { PharmacyLayout } from '@/layouts/pharmacy-layout';
 import { PublicLayout } from '@/layouts/public-layout';
 import { DoctorLayout } from '@/layouts/doctor-layout';
 import { RequireAuth } from '@/components/require-auth';
@@ -25,8 +29,10 @@ import { DoctorPrescriptionsPage } from '@/pages/doctor/doctor-prescriptions-pag
 import { DoctorProfilePage } from '@/pages/doctor/doctor-profile-page';
 import { ConsultationWorkspacePage } from '@/pages/doctor/consultation-workspace-page';
 import { DoctorConsultationsPage } from '@/pages/doctor/doctor-consultations-page';
+import { ChoosePharmacyPage } from '@/pages/prescriptions/choose-pharmacy-page';
 import { PrescriptionDetailPage } from '@/pages/prescriptions/prescription-detail-page';
 import { PrescriptionsPage } from '@/pages/prescriptions/prescriptions-page';
+import { CartPage } from '@/pages/cart/cart-page';
 import { HomePage } from '@/pages/home/home-page';
 import { MedicineDetailPage } from '@/pages/medicines/medicine-detail-page';
 import { MedicinesPage } from '@/pages/medicines/medicines-page';
@@ -60,12 +66,13 @@ export const router = createBrowserRouter([
           { path: '/appointments/:id', element: <AppointmentDetailPage /> },
           { path: '/prescriptions', element: <PrescriptionsPage /> },
           { path: '/prescriptions/:id', element: <PrescriptionDetailPage /> },
+          { path: '/prescriptions/:id/pharmacies', element: <ChoosePharmacyPage /> },
+          { path: '/cart', element: <CartPage /> },
+          { path: '/checkout', element: <CheckoutPage /> },
+          { path: '/orders', element: <OrdersPage /> },
+          { path: '/orders/:id', element: <OrderDetailPage /> },
         ],
       },
-      { path: '/orders', element: <ComingSoonPage title="My Orders" description="Track your medicine orders here once checkout launches." /> },
-      { path: '/orders/:id', element: <ComingSoonPage title="Order Details" /> },
-      { path: '/cart', element: <ComingSoonPage title="Your Cart" description="Full cart and checkout are launching in the next update." /> },
-      { path: '/checkout', element: <ComingSoonPage title="Checkout" /> },
       { path: '/health-records', element: <ComingSoonPage title="Health Records" description="View prescriptions, lab reports and uploaded documents here." /> },
       { path: '/lab-tests', element: <ComingSoonPage title="Lab Tests" description="Book home-collection lab tests here." /> },
       { path: '/lab-tests/:id', element: <ComingSoonPage title="Lab Test" /> },
@@ -101,6 +108,13 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  { element: <RequireRole roles={['PHARMACY_ADMIN', 'PHARMACY_STAFF']} />, children: [
+    { element: <PharmacyLayout />, children: [
+      { path: '/pharmacy', element: <Navigate to="/pharmacy/orders" replace /> },
+      { path: '/pharmacy/orders', element: <OrdersPage pharmacy /> },
+      { path: '/pharmacy/orders/:id', element: <OrderDetailPage pharmacy /> },
+    ] },
+  ] },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },

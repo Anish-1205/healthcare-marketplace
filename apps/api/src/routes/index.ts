@@ -1,7 +1,11 @@
 import { Router } from 'express';
+import { ordersRouter } from '../modules/orders/orders.routes';
+import { deliveriesRouter } from '../modules/deliveries/deliveries.routes';
+import { paymentsRouter } from '../modules/payments/payments.routes';
 import { prisma } from '../config/prisma';
 import { appointmentsRouter } from '../modules/appointments/appointments.routes';
 import { authRouter } from '../modules/auth/auth.routes';
+import { cartRouter } from '../modules/cart/cart.routes';
 import { consultationsRouter } from '../modules/consultations/consultations.routes';
 import { prescriptionsRouter } from '../modules/prescriptions/prescriptions.routes';
 import { demoRouter } from '../modules/demo/demo.routes';
@@ -34,4 +38,8 @@ apiV1.use('/prescriptions', prescriptionsRouter);
 apiV1.use('/organizations', organizationsRouter);
 apiV1.use('/pharmacies', pharmaciesRouter);
 apiV1.use('/medicines', medicinesRouter);
+apiV1.use('/cart', cartRouter);
+apiV1.use('/orders', ordersRouter);
+apiV1.use('/deliveries', deliveriesRouter);
+apiV1.use('/payments', paymentsRouter);
 apiV1.use('/', referenceRouter); // /config, /specialties, /medicine-categories

@@ -7,14 +7,18 @@ import { toSkipTake } from '../../utils/http';
 import { istParts } from '../../utils/time';
 import type { ListOrganizationsQuery } from './organizations.schemas';
 
-const listed = { approvalStatus: 'APPROVED', isActive: true } satisfies Prisma.OrganizationWhereInput;
+// Exported so other modules (e.g. prescriptions.service's pharmacy matching) can reuse the same
+// "listed and open" rules and summary shape instead of duplicating them.
+export const listed = { approvalStatus: 'APPROVED', isActive: true } satisfies Prisma.OrganizationWhereInput;
 
 const toMinutes = (time: string) => {
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
 };
 
-function openStatus(org: { is24Hours: boolean; opensAt: string | null; closesAt: string | null; openDays: number[] }, now: Date) {
+// Exported so other modules (e.g. prescriptions.service's pharmacy matching) can compute the
+// same open/closed label without duplicating the schedule logic.
+export function openStatus(org: { is24Hours: boolean; opensAt: string | null; closesAt: string | null; openDays: number[] }, now: Date) {
   if (org.is24Hours) return { isOpenNow: true, hoursLabel: 'Open 24 hours' };
   if (!org.opensAt || !org.closesAt) return { isOpenNow: false, hoursLabel: 'Hours not available' };
 

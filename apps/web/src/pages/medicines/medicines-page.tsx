@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useMedicines } from '@/hooks/use-medicines';
 import { useMedicineCategories } from '@/hooks/use-reference';
 import { usePharmacy } from '@/hooks/use-pharmacies';
-import { useCartStore } from '@/store/cart-store';
 
 const SORT_OPTIONS = [
   { label: 'Name (A-Z)', value: 'name' },
@@ -32,7 +31,6 @@ export function MedicinesPage() {
   const sort = params.get('sort') ?? 'name';
 
   const pharmacy = usePharmacy(pharmacyId || undefined);
-  const clearCart = useCartStore((s) => s.clear);
 
   const query = useMemo(
     () => ({
@@ -69,10 +67,7 @@ export function MedicinesPage() {
             Shopping from <strong>{pharmacy.data.name}</strong>
           </span>
           <button
-            onClick={() => {
-              clearCart();
-              update('pharmacyId', '');
-            }}
+            onClick={() => update('pharmacyId', '')}
             className="ml-auto flex items-center gap-1 rounded-full p-1 hover:bg-white/40"
             aria-label="Stop shopping from this pharmacy"
           >
@@ -140,7 +135,7 @@ export function MedicinesPage() {
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {data.data.map((medicine) => (
-              <MedicineCard key={medicine.id} medicine={medicine} />
+              <MedicineCard key={medicine.id} medicine={medicine} pharmacyId={pharmacyId || undefined} />
             ))}
           </div>
           <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onChange={(p) => update('page', String(p))} />

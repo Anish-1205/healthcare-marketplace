@@ -28,9 +28,7 @@ export function LoginPage() {
     setServerError(null);
     try {
       const { user } = await login.mutateAsync(values);
-      // Only the doctor portal exists so far; other provider/admin portals fall back to the
-      // patient homepage until their phases land, rather than sending them into a 404.
-      const portalHome = user.portal === 'doctor' ? '/doctor' : '/';
+      const portalHome = user.portal === 'doctor' ? '/doctor' : user.portal === 'pharmacy' ? '/pharmacy' : '/';
       const redirectTo = (location.state as { from?: string } | null)?.from ?? portalHome;
       navigate(redirectTo, { replace: true });
     } catch (error) {

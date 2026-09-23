@@ -40,16 +40,10 @@ export function PrescriptionDetailPage() {
         <PrescriptionSheet prescription={prescription} />
 
         <div className="print-hidden rounded-2xl border border-border bg-card p-5 text-center shadow-sm">
-          <Button size="lg" disabled>
+          <Link to={`/prescriptions/${prescription.id}/pharmacies`} className={buttonVariants({ size: 'lg' })}>
             <ShoppingBag className="h-4.5 w-4.5" /> Order Medicines
-          </Button>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Choosing a pharmacy and ordering these medicines is launching in the next update to this demo. Meanwhile you can{' '}
-            <Link to="/medicines" className="font-medium text-primary hover:underline">
-              browse the medicine catalogue
-            </Link>
-            .
-          </p>
+          </Link>
+          <p className="mt-2 text-sm text-muted-foreground">Choose a pharmacy that stocks these medicines and add them to your cart.</p>
         </div>
       </div>
     </div>
