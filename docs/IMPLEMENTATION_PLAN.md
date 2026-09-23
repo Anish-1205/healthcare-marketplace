@@ -316,3 +316,17 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 - Added a patient-only Health Records page that combines issued prescriptions, consultations, appointment history, uploaded documents and generated lab reports. PDF/JPG/PNG mock uploads store validated metadata up to 10 MB; patients can list and delete their own uploads, while linked lab reports are protected.
 - Existing Prisma models and seed data covered the phase, so no migration was required. Lab processing remains intentionally simulated and the UI clearly identifies demo reports and payments.
 - Verification: **176/176 API tests passed across 16 files**, including 9 new lab and health-record integration tests; workspace typecheck passed; API and web production builds passed. The web build retains the existing dependency annotation and bundle-size warnings.
+
+### Phase 16 implementation and verification
+
+- The patient `/notifications` route now renders the shared notifications page instead of a stale placeholder, with the unread list verified to match the bell icon's unread count.
+- The admin appointments list now sorts newest-created first, so freshly booked appointments appear on page 1 instead of being pushed past the default page size.
+- Post-login redirects now only honour a saved destination when it falls inside the authenticated user's own portal, so staff members are no longer redirected to stale patient routes after logging in.
+- Added a web unit-test suite (Vitest) and a Playwright end-to-end suite; the admin-ordering e2e test books its own appointment rather than relying on seed-data ordering.
+- Verification: API tests passed; new Vitest and Playwright suites passed; workspace typecheck passed.
+
+### Phase 17 implementation and verification
+
+- Extended the broken-image fallback introduced for avatars to pharmacy and organization logos and medicine images: each now tracks a load failure and falls back to the existing gradient/icon placeholder instead of rendering a broken-image icon when the seeded URL 404s.
+- Reviewed loading, empty and error states, dead-end screens and leftover placeholder copy across the patient, doctor, pharmacy, organization and admin portals; the existing skeleton/empty/error components were already applied consistently, so no further changes were required there.
+- Verification: workspace typecheck passed; web Vitest suite passed (11/11).

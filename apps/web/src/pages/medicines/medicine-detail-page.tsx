@@ -1,4 +1,5 @@
 import { Pill, Truck } from 'lucide-react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { cn, formatCurrency } from '@/lib/utils';
 
 export function MedicineDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [imageFailed, setImageFailed] = useState(false);
   const { data: medicine, isLoading, isError, refetch } = useMedicine(id);
   const { data: cart } = useCart();
   const { addToCart, isPending, conflict, cancelConflict, error } = useAddToCart();
@@ -42,8 +44,12 @@ export function MedicineDetailPage() {
   return (
     <div className="container py-8">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className={cn('flex aspect-square items-center justify-center rounded-2xl', !medicine.imageUrl && 'bg-mint')}>
-          {medicine.imageUrl ? <img src={medicine.imageUrl} alt={medicine.name} className="h-full w-full object-contain" /> : <Pill className="h-24 w-24 text-mint-foreground/50" />}
+        <div className={cn('flex aspect-square items-center justify-center rounded-2xl', (!medicine.imageUrl || imageFailed) && 'bg-mint')}>
+          {medicine.imageUrl && !imageFailed ? (
+            <img src={medicine.imageUrl} alt={medicine.name} onError={() => setImageFailed(true)} className="h-full w-full object-contain" />
+          ) : (
+            <Pill className="h-24 w-24 text-mint-foreground/50" />
+          )}
         </div>
 
         <div>

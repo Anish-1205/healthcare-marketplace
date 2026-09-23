@@ -11,10 +11,12 @@ import { useMedicines } from '@/hooks/use-medicines';
 import { usePharmacy } from '@/hooks/use-pharmacies';
 import { useCart } from '@/hooks/use-cart';
 import { avatarHue, formatDistance } from '@/lib/utils';
+import { useState } from 'react';
 
 export function PharmacyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [logoFailed, setLogoFailed] = useState(false);
   const { data: pharmacy, isLoading, isError, refetch } = usePharmacy(id);
   const medicines = useMedicines({ pharmacyId: pharmacy?.id, pageSize: 12 });
   const { data: cart } = useCart();
@@ -47,8 +49,8 @@ export function PharmacyDetailPage() {
     <div className="container py-8">
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          {pharmacy.logoUrl ? (
-            <img src={pharmacy.logoUrl} alt={pharmacy.name} className="h-20 w-20 rounded-2xl object-cover" />
+          {pharmacy.logoUrl && !logoFailed ? (
+            <img src={pharmacy.logoUrl} alt={pharmacy.name} onError={() => setLogoFailed(true)} className="h-20 w-20 rounded-2xl object-cover" />
           ) : (
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-white" style={{ background: `linear-gradient(135deg, hsl(${hue} 60% 46%), hsl(${(hue + 30) % 360} 60% 40%))` }}>
               <Store className="h-9 w-9" />

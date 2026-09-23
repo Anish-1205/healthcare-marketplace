@@ -1,4 +1,5 @@
 import { Bed, Building2, Clock, MapPin, Phone, Siren } from 'lucide-react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DoctorCard } from '@/components/doctor-card';
 import { Avatar } from '@/components/ui/avatar';
@@ -12,6 +13,7 @@ import { avatarHue, formatCurrency, formatDistance } from '@/lib/utils';
 
 export function OrganizationDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [logoFailed, setLogoFailed] = useState(false);
   const { data: org, isLoading, isError, refetch } = useOrganization(id);
 
   if (isLoading) {
@@ -34,8 +36,8 @@ export function OrganizationDetailPage() {
     <div className="container py-8">
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          {org.logoUrl ? (
-            <img src={org.logoUrl} alt={org.name} className="h-20 w-20 rounded-2xl object-cover" />
+          {org.logoUrl && !logoFailed ? (
+            <img src={org.logoUrl} alt={org.name} onError={() => setLogoFailed(true)} className="h-20 w-20 rounded-2xl object-cover" />
           ) : (
             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl text-white" style={{ background: `linear-gradient(135deg, hsl(${hue} 60% 46%), hsl(${(hue + 30) % 360} 60% 40%))` }}>
               <Building2 className="h-9 w-9" />
