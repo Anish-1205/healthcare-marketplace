@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { AvailableSlot, ConsultationType } from '@carebridge/shared';
 import { Monitor, Phone, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +27,8 @@ export function SlotPicker({
   onSelectDate,
   slots,
   isLoading,
+  isError = false,
+  onRetry,
   selectedSlot,
   onSelectSlot,
 }: {
@@ -34,6 +37,8 @@ export function SlotPicker({
   onSelectDate: (date: string) => void;
   slots: AvailableSlot[] | undefined;
   isLoading: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   selectedSlot: AvailableSlot | null;
   onSelectSlot: (slot: AvailableSlot) => void;
 }) {
@@ -83,6 +88,15 @@ export function SlotPicker({
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-10 w-full" />
           ))}
+        </div>
+      ) : isError ? (
+        <div role="alert" className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-6 text-center text-sm text-muted-foreground">
+          <p>We couldn't load available times.</p>
+          {onRetry && (
+            <Button variant="outline" size="sm" className="mt-3" onClick={onRetry}>
+              Try again
+            </Button>
+          )}
         </div>
       ) : !filteredSlots?.length ? (
         <p className="rounded-xl bg-muted px-4 py-6 text-center text-sm text-muted-foreground">No available slots on this date. Try another day.</p>

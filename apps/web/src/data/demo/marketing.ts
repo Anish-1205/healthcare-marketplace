@@ -62,11 +62,11 @@ export const FOOTER_LINKS = {
     { label: 'Register Your Hospital', href: '/register/provider?type=hospital' },
   ],
   Company: [
-    { label: 'About CareBridge', href: '/' },
-    { label: 'Contact', href: '/' },
+    { label: 'About CareBridge', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ],
   Help: [
-    { label: 'Privacy Policy', href: '/' },
-    { label: 'Terms of Service', href: '/' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
   ],
 };

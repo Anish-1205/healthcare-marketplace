@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, ClipboardList, FlaskConical, LogOut, MapPin, Menu, Pill, ShoppingCart, Stethoscope, User, X } from 'lucide-react';
+import { Bell, ClipboardList, FlaskConical, LogOut, Menu, Pill, ShoppingCart, Stethoscope, User, X } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -53,11 +53,6 @@ export function Header() {
         <div className="hidden flex-1 max-w-xs xl:block" />
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          <button className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent md:flex" type="button">
-            <MapPin className="h-4 w-4" />
-            <span>Central District</span>
-          </button>
-
           <button className="rounded-full p-2 text-muted-foreground hover:bg-accent md:hidden" aria-label="Search" onClick={() => setMobileSearchOpen(true)}>
             <SearchIcon />
           </button>

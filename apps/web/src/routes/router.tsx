@@ -12,7 +12,9 @@ import { DoctorLayout } from '@/layouts/doctor-layout';
 import { RequireAuth } from '@/components/require-auth';
 import { RequireRole } from '@/components/require-role';
 import { RequirePermission } from '@/components/require-permission';
-import { ComingSoonPage } from '@/pages/coming-soon-page';
+import { AddressesPage } from '@/pages/profile/addresses-page';
+import { ProfilePage } from '@/pages/profile/profile-page';
+import { StaticPage } from '@/pages/static-page';
 import { AppointmentDetailPage } from '@/pages/appointments/appointment-detail-page';
 import { AppointmentsPage } from '@/pages/appointments/appointments-page';
 import { BookAppointmentPage } from '@/pages/appointments/book-appointment-page';
@@ -111,12 +113,16 @@ export const router = createBrowserRouter([
           { path: '/favorites', element: <FavoritesPage /> },
           { path: '/lab-bookings', element: <LabBookingsPage /> },
           { path: '/lab-bookings/:id', element: <LabBookingDetailPage /> },
+          { path: '/profile', element: <ProfilePage /> },
+          { path: '/profile/addresses', element: <AddressesPage /> },
         ],
       },
       { path: '/notifications', element: <NotificationsPage /> },
-      { path: '/profile', element: <ComingSoonPage title="My Profile" description="Manage your personal details and saved addresses here." /> },
-      { path: '/profile/addresses', element: <ComingSoonPage title="Saved Addresses" /> },
       { path: '/register/provider', element: <ProviderRegistrationPage /> },
+      { path: '/about', element: <StaticPage page="about" /> },
+      { path: '/contact', element: <StaticPage page="contact" /> },
+      { path: '/privacy', element: <StaticPage page="privacy" /> },
+      { path: '/terms', element: <StaticPage page="terms" /> },
 
       { path: '*', element: <NotFoundPage /> },
     ],

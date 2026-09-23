@@ -1,4 +1,4 @@
-import { FlaskConical, Heart, Home as HomeIcon, Smartphone, Video } from 'lucide-react';
+import { Building2, FlaskConical, Heart, Home as HomeIcon, LayoutGrid, Pill, Smartphone, Stethoscope, Store, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CategoryCard } from '@/components/category-card';
 import { DoctorCard } from '@/components/doctor-card';
@@ -67,9 +67,11 @@ export function HomePage() {
           </div>
         ) : categories.isError ? (
           <ErrorState onRetry={() => categories.refetch()} />
+        ) : !categories.data?.length ? (
+          <EmptyState icon={LayoutGrid} title="No categories to show yet" />
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {categories.data?.map((category) => (
+            {categories.data.map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
           </div>
@@ -81,9 +83,11 @@ export function HomePage() {
           <CardRowSkeleton />
         ) : medicines.isError ? (
           <ErrorState onRetry={() => medicines.refetch()} />
+        ) : !medicines.data?.data.length ? (
+          <EmptyState icon={Pill} title="No products to show yet" />
         ) : (
           <ScrollRow>
-            {medicines.data?.data.map((medicine) => (
+            {medicines.data.data.map((medicine) => (
               <ScrollItem key={medicine.id}>
                 <MedicineCard medicine={medicine} className="h-full" />
               </ScrollItem>
@@ -101,9 +105,11 @@ export function HomePage() {
           </div>
         ) : specialties.isError ? (
           <ErrorState onRetry={() => specialties.refetch()} />
+        ) : !specialties.data?.length ? (
+          <EmptyState icon={Stethoscope} title="No specialties to show yet" />
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-            {specialties.data?.map((specialty) => (
+            {specialties.data.map((specialty) => (
               <SpecialtyCard key={specialty.id} specialty={specialty} />
             ))}
           </div>
@@ -133,9 +139,11 @@ export function HomePage() {
           <CardRowSkeleton />
         ) : organizations.isError ? (
           <ErrorState onRetry={() => organizations.refetch()} />
+        ) : !organizations.data?.data.length ? (
+          <EmptyState icon={Building2} title="No clinics or hospitals to show yet" />
         ) : (
           <ScrollRow>
-            {organizations.data?.data.map((org) => (
+            {organizations.data.data.map((org) => (
               <ScrollItem key={org.id} className="w-[280px] sm:w-[300px]">
                 <OrganizationCard organization={org} className="h-full" />
               </ScrollItem>
@@ -149,9 +157,11 @@ export function HomePage() {
           <CardRowSkeleton />
         ) : pharmacies.isError ? (
           <ErrorState onRetry={() => pharmacies.refetch()} />
+        ) : !pharmacies.data?.data.length ? (
+          <EmptyState icon={Store} title="No pharmacies to show yet" />
         ) : (
           <ScrollRow>
-            {pharmacies.data?.data.map((pharmacy) => (
+            {pharmacies.data.data.map((pharmacy) => (
               <ScrollItem key={pharmacy.id} className="w-[280px] sm:w-[300px]">
                 <OrganizationCard organization={pharmacy} className="h-full" />
               </ScrollItem>

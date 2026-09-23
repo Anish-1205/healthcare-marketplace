@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { Logo } from '@/components/logo';
 import { FOOTER_LINKS } from '@/data/demo/marketing';
 
+const SOCIAL_LINKS = [
+  { label: 'Facebook', icon: Facebook },
+  { label: 'Instagram', icon: Instagram },
+  { label: 'Twitter', icon: Twitter },
+  { label: 'LinkedIn', icon: Linkedin },
+];
+
 export function Footer() {
   return (
     <footer className="mt-16 border-t border-border bg-muted/30 pb-20 lg:pb-0">
@@ -12,10 +19,17 @@ export function Footer() {
             <Logo />
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">Doctors, medicines and trusted healthcare providers — all in one place.</p>
             <div className="mt-4 flex gap-2">
-              {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
-                <span key={i} className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm">
+              {SOCIAL_LINKS.map(({ label, icon: Icon }) => (
+                // Demo placeholders: CareBridge has no real social accounts.
+                <a
+                  key={label}
+                  href="#"
+                  aria-label={label}
+                  onClick={(e) => e.preventDefault()}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm hover:text-foreground"
+                >
                   <Icon className="h-4 w-4" />
-                </span>
+                </a>
               ))}
             </div>
           </div>

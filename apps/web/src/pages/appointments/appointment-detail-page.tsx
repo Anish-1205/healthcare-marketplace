@@ -235,6 +235,8 @@ export function AppointmentDetailPage() {
                   }}
                   slots={slots.data}
                   isLoading={slots.isLoading}
+                  isError={slots.isError}
+                  onRetry={() => slots.refetch()}
                   selectedSlot={selectedSlot}
                   onSelectSlot={setSelectedSlot}
                 />

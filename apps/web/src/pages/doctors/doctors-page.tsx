@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { ConsultationType } from '@carebridge/shared';
 import { SlidersHorizontal, Stethoscope, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { DoctorCard } from '@/components/doctor-card';
@@ -18,6 +19,17 @@ const FEE_OPTIONS = [
   { label: 'Up to ₹800', value: '800' },
   { label: 'Up to ₹1200', value: '1200' },
 ];
+
+const TYPE_OPTIONS: { label: string; value: '' | ConsultationType }[] = [
+  { label: 'Any consultation', value: '' },
+  { label: 'In person', value: 'IN_PERSON' },
+  { label: 'Video', value: 'VIDEO' },
+  { label: 'Phone', value: 'PHONE' },
+];
+
+function parseConsultationType(value: string | null): ConsultationType | '' {
+  return TYPE_OPTIONS.find((opt) => opt.value && opt.value === value)?.value ?? '';
+}
 
 const RATING_OPTIONS = [
   { label: 'Any rating', value: '' },
@@ -42,6 +54,7 @@ export function DoctorsPage() {
   const minRating = params.get('minRating') ?? '';
   const sort = params.get('sort') ?? '-rating';
   const q = params.get('q') ?? '';
+  const type = parseConsultationType(params.get('type'));
 
   const query = useMemo(
     () => ({
@@ -51,9 +64,10 @@ export function DoctorsPage() {
       specialty: specialty || undefined,
       feeMax: feeMax ? Number(feeMax) : undefined,
       minRating: minRating ? Number(minRating) : undefined,
+      type: type ? [type] : undefined,
       sort,
     }),
-    [page, q, specialty, feeMax, minRating, sort],
+    [page, q, specialty, feeMax, minRating, type, sort],
   );
   const { data, isLoading, isError, refetch, isPlaceholderData } = useDoctors(query);
 
@@ -66,12 +80,12 @@ export function DoctorsPage() {
   }
 
   const activeSpecialty = specialties.data?.find((s) => s.slug === specialty);
-  const hasFilters = specialty || feeMax || minRating || q;
+  const hasFilters = specialty || feeMax || minRating || q || type;
 
   return (
     <div className="container py-8">
       <PageHeader
-        title={activeSpecialty ? `${activeSpecialty.name}s Near You` : 'Find the Right Doctor'}
+        title={activeSpecialty ? `${activeSpecialty.name}s Near You` : type === 'VIDEO' ? 'Video Consultations' : 'Find the Right Doctor'}
         subtitle="Book online or in-person consultations with verified doctors."
         resultCount={data?.meta.total}
       />
@@ -99,6 +113,13 @@ export function DoctorsPage() {
         </Select>
         <Select value={feeMax} onChange={(e) => update('feeMax', e.target.value)} className="w-auto min-w-[140px]">
           {FEE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </Select>
+        <Select value={type} onChange={(e) => update('type', e.target.value)} className="w-auto min-w-[160px]" aria-label="Consultation type">
+          {TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>

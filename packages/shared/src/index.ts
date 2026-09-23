@@ -12,3 +12,4 @@ export * from './labs';
 export * from './clinical';
 export * from './cart';
 export type * from './orders';
+export * from './profile';

@@ -32,7 +32,7 @@ export function GlobalSearch({ className, autoFocus = false, onNavigate }: { cla
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const debounced = useDebouncedValue(query, 250);
-  const { data, isFetching } = useGlobalSearch(debounced);
+  const { data, isFetching, isError, refetch } = useGlobalSearch(debounced);
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +85,14 @@ export function GlobalSearch({ className, autoFocus = false, onNavigate }: { cla
 
       {open && debounced.trim().length >= 2 && (
         <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-border bg-white p-2 shadow-xl">
-          {groups.length === 0 && !isFetching && (
+          {isError && !isFetching ? (
+            <div role="alert" className="px-4 py-6 text-center text-sm text-muted-foreground">
+              <p>Search is unavailable right now.</p>
+              <button type="button" onClick={() => refetch()} className="mt-2 font-medium text-primary hover:underline">
+                Try again
+              </button>
+            </div>
+          ) : groups.length === 0 && !isFetching && (
             <p className="px-4 py-6 text-center text-sm text-muted-foreground">No results for "{debounced}". Try a doctor, medicine, clinic or specialty.</p>
           )}
           {groups.map(([groupKey, items]) => (
