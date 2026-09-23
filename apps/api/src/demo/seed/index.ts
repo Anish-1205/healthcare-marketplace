@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import type {
   AppointmentStatus,
   ConsultationType,
+  DosageForm,
   FulfillmentType,
   NotificationType,
   OrderStatus,
@@ -33,6 +34,25 @@ import {
   type PatientSeed,
 } from './directory-data';
 import { Random, round2, slugify } from './random';
+
+// Static illustrations served by the web app from apps/web/public/demo/.
+const PRODUCT_ART: Record<DosageForm, string> = {
+  TABLET: 'tablet',
+  CAPSULE: 'capsule',
+  SYRUP: 'bottle',
+  SUSPENSION: 'bottle',
+  DROPS: 'bottle',
+  CREAM: 'tube',
+  OINTMENT: 'tube',
+  GEL: 'tube',
+  LOTION: 'tube',
+  SPRAY: 'spray',
+  INHALER: 'spray',
+  POWDER: 'sachet',
+  SACHET: 'sachet',
+  DEVICE: 'device',
+  OTHER: 'other',
+};
 import {
   CITY,
   DELIVERY_AGENTS,
@@ -396,7 +416,7 @@ export async function seedDatabase(prisma: PrismaClient, options: SeedOptions = 
     const id = randomUUID();
     medicineIds.set(medicine.key, id);
     const { key, category, ...fields } = medicine;
-    rows.medicines.push({ id, ...fields, slug: slugify(medicine.name), categoryId: categoryIds.get(category)!, imageUrl: `/demo/products/${key}.svg`, createdAt: daysAgo(190) });
+    rows.medicines.push({ id, ...fields, slug: slugify(medicine.name), categoryId: categoryIds.get(category)!, imageUrl: `/demo/medicines/${PRODUCT_ART[medicine.dosageForm]}.svg`, createdAt: daysAgo(190) });
   }
 
   const labTestIds = new Map<string, string>();
@@ -423,7 +443,7 @@ export async function seedDatabase(prisma: PrismaClient, options: SeedOptions = 
       slug: slugify(seed.name),
       category: seed.category,
       description: seed.description,
-      logoUrl: `/demo/organizations/${slugify(seed.name)}.svg`,
+      logoUrl: `/demo/organizations/${seed.type.toLowerCase()}.svg`,
       phone: seed.phone,
       email: seed.email,
       registrationNumber: `REG-${seed.type.slice(0, 3)}-${String(1000 + rows.organizations.length)}`,
