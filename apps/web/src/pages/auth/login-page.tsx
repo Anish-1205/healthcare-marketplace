@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/use-auth';
 import { ApiError } from '@/api/client';
 import { loginSchema, type LoginFormValues } from '@/lib/auth-schemas';
+import { postLoginDestination } from '@/lib/portal-navigation';
 import { DemoAccountsPanel } from './demo-accounts-panel';
 
 export function LoginPage() {
@@ -28,8 +29,7 @@ export function LoginPage() {
     setServerError(null);
     try {
       const { user } = await login.mutateAsync(values);
-      const portalHome = user.portal === 'doctor' ? '/doctor' : user.portal === 'organization' ? '/organization' : user.portal === 'pharmacy' ? '/pharmacy' : user.portal === 'admin' ? '/admin' : '/';
-      const redirectTo = (location.state as { from?: string } | null)?.from ?? portalHome;
+      const redirectTo = postLoginDestination(user.portal, (location.state as { from?: string } | null)?.from);
       navigate(redirectTo, { replace: true });
     } catch (error) {
       setServerError(error instanceof ApiError ? error.message : 'Something went wrong. Please try again.');

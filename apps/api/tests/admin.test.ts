@@ -27,6 +27,32 @@ describe('admin overview and platform reads', () => {
     expect(report.status).toBe(200);
     expect(report.body.data.totals).toMatchObject({ appointments: expect.any(Number), orders: expect.any(Number), gmv: expect.any(Number) });
   });
+
+  it('shows a newly booked appointment on the first admin appointments page', async () => {
+    const patientRow = await prisma.patient.findFirstOrThrow();
+    const doctorRow = await prisma.doctor.findFirstOrThrow();
+    const appointmentNumber = `APT-ADMIN-${Date.now()}`;
+    const created = await prisma.appointment.create({
+      data: {
+        appointmentNumber,
+        patientId: patientRow.id,
+        doctorId: doctorRow.id,
+        consultationType: 'VIDEO',
+        scheduledStart: new Date('2025-01-01T10:00:00.000Z'),
+        scheduledEnd: new Date('2025-01-01T10:30:00.000Z'),
+        status: 'CONFIRMED',
+        fee: 500,
+      },
+    });
+
+    try {
+      const response = await api().get('/api/v1/admin/appointments?page=1&pageSize=20').set('Authorization', admin.auth);
+      expect(response.status).toBe(200);
+      expect(response.body.data[0]).toMatchObject({ id: created.id, appointmentNumber });
+    } finally {
+      await prisma.appointment.delete({ where: { id: created.id } });
+    }
+  });
 });
 
 describe('provider approvals', () => {

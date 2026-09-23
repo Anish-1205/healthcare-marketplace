@@ -36,6 +36,16 @@ describe('/notifications', () => {
     expect(unread.body.meta.total).toBe(count.body.data.count);
   });
 
+  it('returns the same patient notifications represented by the unread bell count', async () => {
+    const count = await api().get('/api/v1/notifications/unread-count').set('Authorization', patient.auth);
+    const list = await api().get('/api/v1/notifications?unread=true&pageSize=100').set('Authorization', patient.auth);
+
+    expect(count.status).toBe(200);
+    expect(list.status).toBe(200);
+    expect(list.body.data).toHaveLength(count.body.data.count);
+    expect(list.body.data.every((notification: { userId: string; isRead: boolean }) => notification.userId === patient.user.id && !notification.isRead)).toBe(true);
+  });
+
   it('marks a notification read, but never another user’s', async () => {
     const own = await prisma.notification.findFirstOrThrow({ where: { userId: doctor.user.id } });
     const foreign = await prisma.notification.findFirstOrThrow({ where: { userId: patient.user.id, isRead: false } });

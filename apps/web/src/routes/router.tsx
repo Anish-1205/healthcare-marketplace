@@ -25,7 +25,7 @@ import { DoctorAppointmentDetailPage } from '@/pages/doctor/doctor-appointment-d
 import { DoctorAppointmentsPage } from '@/pages/doctor/doctor-appointments-page';
 import { DoctorAvailabilityPage } from '@/pages/doctor/doctor-availability-page';
 import { DoctorDashboardPage } from '@/pages/doctor/doctor-dashboard-page';
-import { DoctorNotificationsPage } from '@/pages/doctor/doctor-notifications-page';
+import { DoctorNotificationsPage, NotificationsPage } from '@/pages/doctor/doctor-notifications-page';
 import { DoctorPatientDetailPage } from '@/pages/doctor/doctor-patient-detail-page';
 import { DoctorPatientsPage } from '@/pages/doctor/doctor-patients-page';
 import { DoctorPrescriptionDetailPage } from '@/pages/doctor/doctor-prescription-detail-page';
@@ -111,7 +111,7 @@ export const router = createBrowserRouter([
         ],
       },
       { path: '/favorites', element: <ComingSoonPage title="Favorites" description="Doctors, clinics and pharmacies you've saved will show up here." /> },
-      { path: '/notifications', element: <ComingSoonPage title="Notifications" /> },
+      { path: '/notifications', element: <NotificationsPage /> },
       { path: '/profile', element: <ComingSoonPage title="My Profile" description="Manage your personal details and saved addresses here." /> },
       { path: '/profile/addresses', element: <ComingSoonPage title="Saved Addresses" /> },
       { path: '/register/provider', element: <ProviderRegistrationPage /> },

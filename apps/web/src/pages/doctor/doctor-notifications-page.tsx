@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useMarkAllNotificationsRead, useMarkNotificationRead, useNotifications } from '@/hooks/use-notifications';
 import { cn } from '@/lib/utils';
 
-export function DoctorNotificationsPage() {
+export function NotificationsPage() {
   const { data, isLoading, isError, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -59,3 +59,5 @@ export function DoctorNotificationsPage() {
     </div>
   );
 }
+
+export const DoctorNotificationsPage = NotificationsPage;
