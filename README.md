@@ -4,7 +4,7 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 
 > **Demo only.** This is a demonstration application. Healthcare information shown here is sample data and must not be used for medical decisions. Payments, delivery, video consultation and messaging are simulated.
 
-**Status:** Phases 0–18 are complete, including cross-portal integration, UI polish, and automated testing of the critical workflows. Phase 18 verification passed 206 API tests, 25 frontend tests, and 19 browser tests. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) and [docs/TESTING.md](docs/TESTING.md).
+**Status:** Phases 0–16, 18, and 19 are complete. Phase 17 UI polish is partial; see the deferred items in the [implementation plan](docs/IMPLEMENTATION_PLAN.md). Phase 18 passed 206 API, 25 frontend, and 19 browser tests.
 
 ## Stack
 
@@ -13,24 +13,19 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 | API | Node.js, Express 5, TypeScript, Prisma 6, PostgreSQL, Zod, JWT, bcrypt (`bcryptjs`) |
 | Web | React 18, Vite, TypeScript, Tailwind, hand-written shadcn-style primitives, TanStack Query, React Router, React Hook Form + Zod, Zustand |
 | Shared | `@carebridge/shared`: roles, permission matrix, status enums, API/catalog types, demo accounts |
-| Tests | Vitest + Supertest |
+| Tests | Vitest, Supertest, Playwright |
 
 This is a pnpm monorepo: `apps/api`, `apps/web`, `packages/shared`, `docs`.
 
 ## Prerequisites
 
 - **Node.js 20.19+** (22 LTS recommended; developed on 24)
-- **pnpm 10** (`corepack enable` or `npm i -g pnpm`)
-- **PostgreSQL 14+**, either through Docker using the bundled `docker-compose.yml`, or a local install
+- **pnpm 10.31.0** (`corepack enable` or `npm i -g pnpm@10.31.0`)
+- **PostgreSQL 17** (bundled Docker Compose) or a compatible local PostgreSQL installation. Start Docker Desktop/daemon before `pnpm db:up`.
 
 ## Setup
 
-```bash
-pnpm install                 # also builds @carebridge/shared and generates the Prisma client
-pnpm db:up                   # optional: start PostgreSQL in Docker on localhost:5433
-```
-
-Create `apps/api/.env`:
+From the repository root, copy `apps/api/.env.example` to `apps/api/.env` and set a unique `JWT_SECRET` (at least 32 characters). The example uses the Docker database; replace its URL if using local PostgreSQL.
 
 ```dotenv
 # Docker database (pnpm db:up). For a local install use your own credentials/port.
@@ -44,11 +39,13 @@ DEMO_MODE=true
 DEMO_SCENARIO_STATE=ready     # ready | complete (see "Golden demo scenario")
 ```
 
-Only `DATABASE_URL` is required. Everything else has safe development defaults, and the API refuses to start in production with the default JWT secret.
+The API requires `DATABASE_URL`. The other values shown are explicit development settings; the API refuses to start in production with its built-in JWT secret. `pnpm install` builds the shared package and generates the Prisma client.
 
 ```bash
+pnpm install
+pnpm db:up                   # Docker must already be running; skip for local PostgreSQL
 pnpm db:deploy               # apply migrations
-pnpm db:seed                 # load demo data (~1s, deterministic)
+pnpm db:seed                 # load the ready demo scenario
 pnpm dev:api                 # http://localhost:4000/api/v1  (health: /api/v1/health)
 ```
 
@@ -83,18 +80,18 @@ Other seeded logins follow the same password, for example `arjun.mehta@carebridg
 
 ## Golden demo scenario
 
-**Rahul Verma → Dr. Maya Rao (Sunrise Family Clinic) → RX-2026-00125 → City Care Pharmacy → ORD-2026-0042**
+**Rahul Verma → Dr. Maya Rao (Sunrise Family Clinic) → prescription → City Care Pharmacy → delivery**
 
-- `pnpm db:seed:ready` (default) sets up the live demo. Rahul has no Maya appointment yet, and Maya's 5:30 PM slot today is free. The prescription and order you create live become exactly **RX-2026-00125** and **ORD-2026-0042**.
+- `pnpm db:seed:ready` (the `pnpm db:seed` default) reserves Maya's 5:30 PM slot today if it is still in the future; otherwise choose another available slot. With an untouched seed, the next prescription and order are **RX-<current year>-00125** and **ORD-<current year>-0042**. Other writes can change those numbers.
 - `pnpm db:seed:complete` pre-seeds the whole chain, from yesterday's appointment to the delivered order. It shows up in the patient, doctor, clinic, pharmacy and admin portals.
 
 ## Demo mode and resetting data
 
-With `DEMO_MODE=true` you get demo accounts (`GET /api/v1/demo/accounts`), simulated payments and delivery, mock lab bookings, a mock password-reset token, and a reset endpoint.
+`DEMO_MODE=true` exposes demo accounts (`GET /api/v1/demo/accounts`) and enables simulated payments and delivery. Lab bookings, document metadata and password-reset tokens are also mock implementations. The reset endpoint additionally requires a non-production environment and an admin token.
 
 Ways to reset:
 
-- `pnpm db:seed`: truncate and reseed (keeps the schema).
+- `pnpm db:seed`: truncate and reseed demo records (keeps the schema; invalidates prior demo sessions).
 - `pnpm db:reset`: drop the database, re-run migrations, then seed.
 - `POST /api/v1/demo/reset` with an admin token and body `{ "scenarioState": "ready" | "complete" }`. This only works when `NODE_ENV !== production`. It invalidates all sessions.
 
@@ -114,12 +111,14 @@ Ways to reset:
 
 ### Tests
 
-Tests run against a **separate** database so your demo data is never touched. The default is `carebridge_test` on the Docker Postgres; override it with `TEST_DATABASE_URL`. Create the database once:
+Tests migrate and reseed a **separate** database, `carebridge_test` by default. Never point `TEST_DATABASE_URL` at your demo or production database. Keep Docker running and create the test database once:
 
 ```bash
 docker exec carebridge-postgres psql -U carebridge -c "CREATE DATABASE carebridge_test;"
 pnpm test
 ```
+
+Playwright also requires installed Microsoft Edge. The browser suite starts test servers on ports 4001 and 5174. The golden-flow test can be timing-sensitive on slow machines; rerun the failing test and inspect its saved trace before treating a timeout as an application failure. See [testing notes](docs/TESTING.md).
 
 The suite covers login for every demo account, registration, password reset, token/deactivation handling, the RBAC matrix, tenant isolation, route authorization, seed invariants (data volumes, golden numbering, data consistency across portals), provider onboarding and approval, platform management, lab booking and health-record isolation, notifications, global search and doctor/organization/pharmacy/medicine discovery (filters, pagination, real slot availability). Critical workflow tests also cover concurrent booking, prescription creation, pharmacy checkout, delivery progression and cross-tenant delivery access. See [docs/TESTING.md](docs/TESTING.md) for coverage, browser prerequisites and the golden-flow walkthrough checklist.
 
@@ -133,5 +132,5 @@ The suite covers login for every demo account, registration, password reset, tok
 
 ## Documentation
 
-- [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md): architecture, modules, entity map, page map, API map, RBAC matrix, demo data strategy, phases
-- Planned for Phase 19: `ARCHITECTURE.md`, `DATABASE.md`, `API.md`, `RBAC.md`, `DEMO_GUIDE.md`, `PRODUCTION_READINESS.md`
+- [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE.md) · [API](docs/API.md) · [RBAC](docs/RBAC.md)
+- [Client demo guide](docs/DEMO_GUIDE.md) · [Testing](docs/TESTING.md) · [Production readiness](docs/PRODUCTION_READINESS.md) · [Implementation plan](docs/IMPLEMENTATION_PLAN.md)

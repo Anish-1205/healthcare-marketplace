@@ -266,9 +266,9 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 14 | Admin portal | ✅ Overview, approvals, management, activity, reports, settings, charts |
 | 15 | Lab tests & health records | ✅ Catalogue/packages, home collection booking and status, simulated payment/refund, aggregated health-record vault, mock upload |
 | 16 | Cross-portal integration | ✅ Notifications; eligible patient reviews, admin moderation and rating recalculation; saved providers across cards, detail pages and favorites |
-| 17 | UI polish | ✅ Loading/empty/error states, responsive, mobile nav, image fallbacks and demo navigation gaps |
+| 17 | UI polish | ⚠ Partial: demo navigation and image fallbacks improved; pharmacy/lab error states, favorites/moderation styling, and card hierarchy remain deferred |
 | 18 | Testing | ✅ 206 API tests, 25 frontend tests, 19 browser tests; desktop/mobile booking-to-delivery, concurrent booking and delivery tenant isolation |
-| 19 | Documentation | README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS |
+| 19 | Documentation | ✅ README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS; live guide checks |
 | 20 | Full demo verification | Golden flow end-to-end in the browser |
 
 ### Phase 11 verification
@@ -331,7 +331,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 ### Phase 17 implementation and verification
 
 - Extended the broken-image fallback introduced for avatars to pharmacy and organization logos and medicine images: each now tracks a load failure and falls back to the existing gradient/icon placeholder instead of rendering a broken-image icon when the seeded URL 404s.
-- Reviewed loading, empty and error states, dead-end screens and leftover placeholder copy across the patient, doctor, pharmacy, organization and admin portals; the existing skeleton/empty/error components were already applied consistently, so no further changes were required there.
+- Reviewed loading, empty and error states and demo navigation across portals. This was not a full UI-polish sign-off: pharmacy/lab error states, favorites and review-moderation styling, and card hierarchy still need a focused pass.
 - Verification: workspace typecheck passed; web Vitest suite passed (11/11).
 
 ### Phase 18 implementation and verification
