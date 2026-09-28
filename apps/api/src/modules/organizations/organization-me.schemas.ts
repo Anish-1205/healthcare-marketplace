@@ -8,7 +8,7 @@ export const organizationQuery = z.object({ organizationId: z.uuid().optional() 
 
 export const updateOrganizationProfileSchema = z.object({
   name: z.string().trim().min(2).max(150).optional(),
-  category: nullableText(100), description: nullableText(2000), logoUrl: z.url().nullable().optional(),
+  category: nullableText(100), description: nullableText(2000), logoUrl: z.union([z.url(), z.string().regex(/^\/demo\/organizations\/[a-z0-9-]+\.svg$/)]).nullable().optional(),
   phone: nullableText(30), email: z.email().nullable().optional(), website: z.url().nullable().optional(),
   addressLine1: nullableText(200), addressLine2: nullableText(200), locality: nullableText(100),
   city: nullableText(100), state: nullableText(100), postalCode: nullableText(20),

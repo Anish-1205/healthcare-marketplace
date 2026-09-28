@@ -62,7 +62,7 @@ describe('organization management', () => {
   it('updates profile fields and restores them', async () => {
     const before = await api().get('/api/v1/organizations/me').set('Authorization', clinic.auth);
     const original = before.body.data;
-    const updated = await api().patch('/api/v1/organizations/me').set('Authorization', clinic.auth).send({ description: 'Updated during the organization portal test.', opensAt: '08:30', closesAt: '20:30' });
+    const updated = await api().patch('/api/v1/organizations/me').set('Authorization', clinic.auth).send({ ...original, description: 'Updated during the organization portal test.', opensAt: '08:30', closesAt: '20:30' });
     expect(updated.status).toBe(200);
     expect(updated.body.data).toMatchObject({ description: 'Updated during the organization portal test.', opensAt: '08:30', closesAt: '20:30' });
     await api().patch('/api/v1/organizations/me').set('Authorization', clinic.auth).send({ description: original.description, opensAt: original.opensAt, closesAt: original.closesAt });
