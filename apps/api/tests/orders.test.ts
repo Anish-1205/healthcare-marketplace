@@ -286,6 +286,27 @@ describe('pharmacy lifecycle and delivery', () => {
   });
 });
 describe('order access and simulated payments', () => {
+  it('rejects another pharmacy and the patient changing an assigned delivery', async () => {
+    const order = await place();
+    for (const value of ['CONFIRMED', 'PREPARING', 'READY_FOR_PICKUP']) expect((await status(order.id, value)).status).toBe(200);
+    const assigned = await api().post(`/api/v1/orders/${order.id}/delivery`).set('Authorization', staff.auth).send({});
+    expect(assigned.status).toBe(200);
+    const deliveryId = assigned.body.data.delivery.id;
+    const otherMember = await prisma.organizationStaff.findFirstOrThrow({
+      where: { organizationId: { not: pharmacyId }, isActive: true, organization: { type: 'PHARMACY', approvalStatus: 'APPROVED' }, user: { status: 'ACTIVE' } },
+      include: { user: true },
+    });
+    const otherStaff = await signIn(otherMember.user.email);
+    for (const auth of [otherStaff.auth, patient.auth]) {
+      const denied = await api().post(`/api/v1/deliveries/${deliveryId}/status`).set('Authorization', auth).send({ status: 'PICKED_UP' });
+      expect(denied.status).toBe(403);
+    }
+    const unchanged = await api().get(`/api/v1/orders/${order.id}`).set('Authorization', staff.auth);
+    expect(unchanged.body.data.status).toBe('READY_FOR_PICKUP');
+    expect(unchanged.body.data.delivery.status).toBe('ASSIGNED');
+    expect(unchanged.body.data.delivery.statusHistory).toHaveLength(1);
+  });
+
   it('isolates patient reads, lists, cancellations, and payments', async () => {
     const order = await place();
     const other = await registerPatient('order-other');

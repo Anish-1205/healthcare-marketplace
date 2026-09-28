@@ -266,8 +266,8 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 14 | Admin portal | ✅ Overview, approvals, management, activity, reports, settings, charts |
 | 15 | Lab tests & health records | ✅ Catalogue/packages, home collection booking and status, simulated payment/refund, aggregated health-record vault, mock upload |
 | 16 | Cross-portal integration | ✅ Notifications; eligible patient reviews, admin moderation and rating recalculation; saved providers across cards, detail pages and favorites |
-| 17 | UI polish | Loading/empty/error states, responsive, mobile nav |
-| 18 | Testing | Booking, prescriptions, orders, tenant isolation, status progression |
+| 17 | UI polish | ✅ Loading/empty/error states, responsive, mobile nav, image fallbacks and demo navigation gaps |
+| 18 | Testing | ✅ 206 API tests, 25 frontend tests, 19 browser tests; desktop/mobile booking-to-delivery, concurrent booking and delivery tenant isolation |
 | 19 | Documentation | README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS |
 | 20 | Full demo verification | Golden flow end-to-end in the browser |
 
@@ -333,3 +333,12 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 - Extended the broken-image fallback introduced for avatars to pharmacy and organization logos and medicine images: each now tracks a load failure and falls back to the existing gradient/icon placeholder instead of rendering a broken-image icon when the seeded URL 404s.
 - Reviewed loading, empty and error states, dead-end screens and leftover placeholder copy across the patient, doctor, pharmacy, organization and admin portals; the existing skeleton/empty/error components were already applied consistently, so no further changes were required there.
 - Verification: workspace typecheck passed; web Vitest suite passed (11/11).
+
+### Phase 18 implementation and verification
+
+- Added a concurrent appointment test proving two patients competing for the same slot receive one success and one conflict, with exactly one persisted appointment/payment and no charge for the loser. Added delivery mutation checks proving both another pharmacy and the patient receive 403 without changing delivery status/history.
+- Added `golden-flow.spec.ts`: patient discovery/booking and simulated payment → doctor notes and catalogue prescription → consultation completion/automatic prescription issue → patient pharmacy selection/cart/checkout → pharmacy prescription review, preparation and delivery → patient tracking at every transition → admin visibility. All workflow mutations use UI controls and real APIs, with separate browser contexts for each role.
+- The flow runs at 1440px and 390px, asserts complete timestamped order/delivery history, rejects browser runtime/API errors, checks horizontal overflow at checkpoints and saves screenshots. Visual review of booking, consultation, delivered-order and admin screenshots found a stale checkout banner on delivered orders; it now appears only while an order is pending, with a browser regression assertion.
+- Added browser test/config TypeScript checking, the cached Node type dependency, `pnpm test:e2e`, and the sequential `pnpm test:phase18` gate. [TESTING.md](TESTING.md) contains the coverage map, environment requirements, commands and manual presenter checklist.
+- Verification on 2026-09-28: `pnpm test:phase18` passed workspace typechecks/builds, **206/206 API tests across 18 files**, **25/25 frontend tests across 4 files**, and **19/19 Playwright tests**. After the screenshot-driven banner fix, web typecheck/build and **both golden-flow tests** passed again (57.3 seconds). Existing dependency-comment and bundle-size build warnings remain non-blocking.
+- Integration/browser tests migrated and seeded only `carebridge_test` on local PostgreSQL port 5433; browser servers used ports 4001/5174. No schema migration was added. Verification used automated browser interactions plus manual screenshot inspection; a human presenter session and the broader Phase 20 demo sign-off remain separate.

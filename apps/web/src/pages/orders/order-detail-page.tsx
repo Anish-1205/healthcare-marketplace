@@ -64,7 +64,7 @@ export function OrderDetailPage({ pharmacy = false }: { pharmacy?: boolean }) {
   }
   return (
     <div className={pharmacy ? '' : 'container py-8'}>
-      {!pharmacy && (location.state as { justPlaced?: boolean } | null)?.justPlaced && (
+      {!pharmacy && order.status === 'PENDING' && (location.state as { justPlaced?: boolean } | null)?.justPlaced && (
         <div className="mb-6 flex items-center gap-3 rounded-2xl bg-mint p-5 text-mint-foreground">
           <CheckCircle2 />
           <div>

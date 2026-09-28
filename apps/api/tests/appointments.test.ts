@@ -102,6 +102,25 @@ describe('POST /appointments', () => {
     expect(second.body.error.code).toBe('SLOT_UNAVAILABLE');
   });
 
+  it('allows exactly one patient to book a slot concurrently, without charging the loser', async () => {
+    const other = await registerPatient('booking-race');
+    const [slot] = await findSlots(doctorId);
+    const responses = await Promise.all([book(patient.auth, slot), book(other.auth, slot)]);
+    expect(responses.map((r) => r.status).sort()).toEqual([201, 409]);
+    expect(responses.find((r) => r.status === 409)!.body.error.code).toBe('SLOT_UNAVAILABLE');
+    const winner = responses.find((r) => r.status === 201)!.body.data;
+    const rows = await prisma.appointment.findMany({
+      where: { doctorId, scheduledStart: new Date(slot.start), status: { not: 'CANCELLED' } },
+      include: { payments: true },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].id).toBe(winner.id);
+    expect(rows[0].payments).toHaveLength(1);
+    expect(rows[0].payments[0].status).toBe('PAID');
+    const loser = responses[0].status === 409 ? patient : other;
+    expect(await prisma.payment.count({ where: { patientId: loser.user.patientId, appointment: { scheduledStart: new Date(slot.start) } } })).toBe(0);
+  });
+
   it('rejects a time the doctor does not offer', async () => {
     const slots = await findSlots(doctorId);
     const offSchedule = new Date(new Date(slots[0].start).getTime() + 7 * 60_000).toISOString();

@@ -4,7 +4,7 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 
 > **Demo only.** This is a demonstration application. Healthcare information shown here is sample data and must not be used for medical decisions. Payments, delivery, video consultation and messaging are simulated.
 
-**Status:** Phases 0–15 are complete: platform foundations, patient marketplace and appointments, doctor consultations and prescriptions, pharmacy ordering and delivery, clinic/hospital and platform operations, plus demo lab tests and patient health records. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+**Status:** Phases 0–18 are complete, including cross-portal integration, UI polish, and automated testing of the critical workflows. Phase 18 verification passed 206 API tests, 25 frontend tests, and 19 browser tests. See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) and [docs/TESTING.md](docs/TESTING.md).
 
 ## Stack
 
@@ -104,7 +104,9 @@ Ways to reset:
 |---|---|
 | `pnpm dev:api` | API with hot reload |
 | `pnpm build` / `pnpm typecheck` | Build or typecheck all packages |
-| `pnpm test` | API tests (see below) |
+| `pnpm test` | API integration and frontend unit tests (see below) |
+| `pnpm test:e2e` | Playwright browser tests, including desktop/mobile booking-to-delivery |
+| `pnpm test:phase18` | Typechecks, builds, unit/integration tests, then browser tests |
 | `pnpm db:migrate` | Create/apply a migration in development |
 | `pnpm db:deploy` | Apply existing migrations |
 | `pnpm db:seed[:ready\|:complete]` | Load demo data |
@@ -119,11 +121,11 @@ docker exec carebridge-postgres psql -U carebridge -c "CREATE DATABASE carebridg
 pnpm test
 ```
 
-The suite covers login for every demo account, registration, password reset, token/deactivation handling, the RBAC matrix, tenant isolation, route authorization, seed invariants (data volumes, golden numbering, data consistency across portals), provider onboarding and approval, platform management, lab booking and health-record isolation, notifications, global search and doctor/organization/pharmacy/medicine discovery (filters, pagination, real slot availability).
+The suite covers login for every demo account, registration, password reset, token/deactivation handling, the RBAC matrix, tenant isolation, route authorization, seed invariants (data volumes, golden numbering, data consistency across portals), provider onboarding and approval, platform management, lab booking and health-record isolation, notifications, global search and doctor/organization/pharmacy/medicine discovery (filters, pagination, real slot availability). Critical workflow tests also cover concurrent booking, prescription creation, pharmacy checkout, delivery progression and cross-tenant delivery access. See [docs/TESTING.md](docs/TESTING.md) for coverage, browser prerequisites and the golden-flow walkthrough checklist.
 
 ## Web app
 
-`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*`, `/organization/*`, `/pharmacy/*`, and `/admin/*` provide role-protected workspaces for doctors, clinics/hospitals, pharmacies, and the platform team. Patients can browse `/lab-tests`, track `/lab-bookings`, and use the mock document vault at `/health-records`. Favorites and the patient notifications list remain clearly labelled upcoming features for later phases.
+`apps/web` is a Vite + React SPA. Everything under `/` is public and shared by anonymous and signed-in patients (the homepage personalizes when you're logged in, per the demo data strategy). `/doctor/*`, `/organization/*`, `/pharmacy/*`, and `/admin/*` provide role-protected workspaces for doctors, clinics/hospitals, pharmacies, and the platform team. Patients can browse `/lab-tests`, track `/lab-bookings`, use the mock document vault at `/health-records`, save providers at `/favorites`, and read updates at `/notifications`.
 
 - `pnpm --filter @carebridge/web dev` — dev server on 5173, proxies `/api/*` to the API on 4000
 - `pnpm --filter @carebridge/web build` — typecheck + production build
