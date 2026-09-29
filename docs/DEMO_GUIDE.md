@@ -20,11 +20,13 @@ The browser test `apps/web/e2e/golden-flow.spec.ts` exercises this path at deskt
 
 ## Demo 2 — Provider registration → admin approval
 
+**Current boundary:** registration and approval work. Pharmacy profile editing, delivery settings and inventory entry are not implemented, so the final three steps of Scenario 2 in the master prompt cannot yet be presented. Use seeded City Care Pharmacy for the order-fulfillment demonstration.
+
 | Account and screen | Click or enter | Expected result |
 |---|---|
 | No account, `/register/provider` | Click **Pharmacy**. Fill owner name, a new unique email, phone, a chosen strong password, business name/contact/registration number, address and PIN. Optionally enter `registration-certificate.pdf` in **Mock registration document**. Click **Submit for approval**. | The owner signs in automatically to the pharmacy portal. Their organization is **Pending approval** and is absent from public pharmacy results. The document is metadata; no PDF is uploaded. |
 | Platform Employee `employee@carebridge.demo`, `/admin/approvals` | Find the submitted pharmacy name, inspect the listed document metadata, click **Approve**. | The entry leaves the approval queue and the pharmacy becomes eligible for public discovery. **Reject** instead requires a reason. |
-| New pharmacy owner, `/pharmacy/orders` and public `/pharmacies` | Refresh or sign in again with the newly chosen credentials; search for the pharmacy by name in public discovery. | Approval is reflected in the account and public pharmacy listing. New pharmacies have no inventory or orders until configured. |
+| New pharmacy owner, `/pharmacy/orders` and public `/pharmacies` | Refresh or sign in again with the newly chosen credentials; locate the pharmacy in the public listing. | The pending-approval message disappears and the pharmacy has a public profile. New pharmacies have no inventory or orders; self-service inventory configuration is not yet available. |
 
 Use a fresh email and registration number on each run, or reseed the demo first. A newly registered provider uses its chosen password; `Demo@123` applies only if that is what you entered.
 

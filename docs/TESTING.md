@@ -1,4 +1,6 @@
-# Phase 18 verification
+# Demo testing and verification
+
+Phase 20 results, fixes and remaining acceptance gaps are recorded in [DEMO_VERIFICATION.md](DEMO_VERIFICATION.md). `pnpm test:demo` runs the full sequential check suite; `pnpm test:phase18` remains available with the same commands.
 
 ## Run the checks
 
@@ -22,6 +24,10 @@ pnpm --filter @carebridge/web test:e2e golden-flow.spec.ts
 Both integration and browser setup apply migrations and reseed the test database. Run these suites sequentially because they share that database. `TEST_DATABASE_URL` must point to a disposable test database, never the development demo or production database.
 
 Playwright uses installed Microsoft Edge and starts dedicated API/web servers on ports 4001/5174. Leave those ports free. Browser failures retain a trace under `apps/web/test-results`; the golden flow also attaches screenshots at major checkpoints. Open a failed trace with `pnpm --filter @carebridge/web exec playwright show-trace <trace-path>`.
+
+If Windows reserves those ports, set `E2E_API_PORT` and/or `E2E_WEB_PORT` to available ports. All browser fixtures and server URLs use these settings. `TEST_DATABASE_URL` can likewise point to a disposable PostgreSQL database on another port. See the Phase 20 report for a PowerShell example.
+
+`demo-verification.spec.ts` adds real browser checks for pharmacy registration/document review/approval and subsequent login/public discovery, clinic doctor association/schedule persistence/operations/reports, marketplace pagination and populated desktop/mobile homepages. It does not cover the unimplemented pharmacy self-service setup screens.
 
 ## Critical coverage
 

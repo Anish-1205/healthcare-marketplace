@@ -269,7 +269,7 @@ The live prescription content (contact dermatitis: hydrocortisone cream, levocet
 | 17 | UI polish | ⚠ Partial: demo navigation and image fallbacks improved; pharmacy/lab error states, favorites/moderation styling, and card hierarchy remain deferred |
 | 18 | Testing | ✅ 206 API tests, 25 frontend tests, 19 browser tests; desktop/mobile booking-to-delivery, concurrent booking and delivery tenant isolation |
 | 19 | Documentation | ✅ README, ARCHITECTURE, DATABASE, API, DEMO_GUIDE, RBAC, PRODUCTION_READINESS; live guide checks |
-| 20 | Full demo verification | Golden flow end-to-end in the browser |
+| 20 | Full demo verification | Verification pass complete: 206 API, 25 web, 25 browser tests passed; full acceptance remains open for pharmacy self-service and deferred polish. See DEMO_VERIFICATION.md |
 
 ### Phase 11 verification
 
