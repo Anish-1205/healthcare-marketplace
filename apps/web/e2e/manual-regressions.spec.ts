@@ -1,6 +1,7 @@
+import { API_URL as API, WEB_URL } from './environment';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
-const API = 'http://127.0.0.1:4001/api/v1';
+
 
 interface Slot {
   start: string;
@@ -67,7 +68,7 @@ test.describe('manual regression walkthrough', () => {
   for (const [label, destination] of accounts) {
     test(`${label} lands in the correct portal`, async ({ page }) => {
       await loginAs(page, label);
-      await expect(page).toHaveURL(new URL(destination, 'http://127.0.0.1:5174').toString());
+      await expect(page).toHaveURL(new URL(destination, WEB_URL).toString());
     });
   }
 

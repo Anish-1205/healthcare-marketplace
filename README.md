@@ -4,7 +4,7 @@ A **demo** multi-tenant healthcare marketplace. Patients can find doctors, book 
 
 > **Demo only.** This is a demonstration application. Healthcare information shown here is sample data and must not be used for medical decisions. Payments, delivery, video consultation and messaging are simulated.
 
-**Status:** Phases 0–16, 18, and 19 are complete. Phase 17 UI polish is partial; see the deferred items in the [implementation plan](docs/IMPLEMENTATION_PLAN.md). Phase 18 passed 206 API, 25 frontend, and 19 browser tests.
+**Status:** Phase 20 verification passed 206 API, 25 frontend and 25 browser tests, including desktop/mobile booking-to-delivery. Full master-prompt acceptance remains open: pharmacy self-service setup is missing and Phase 17 polish is partial. See the [verification report](docs/DEMO_VERIFICATION.md) for evidence and remaining gaps.
 
 ## Stack
 
@@ -103,7 +103,7 @@ Ways to reset:
 | `pnpm build` / `pnpm typecheck` | Build or typecheck all packages |
 | `pnpm test` | API integration and frontend unit tests (see below) |
 | `pnpm test:e2e` | Playwright browser tests, including desktop/mobile booking-to-delivery |
-| `pnpm test:phase18` | Typechecks, builds, unit/integration tests, then browser tests |
+| `pnpm test:demo` / `pnpm test:phase18` | Typechecks, builds, unit/integration tests, then browser tests |
 | `pnpm db:migrate` | Create/apply a migration in development |
 | `pnpm db:deploy` | Apply existing migrations |
 | `pnpm db:seed[:ready\|:complete]` | Load demo data |
@@ -133,4 +133,4 @@ The suite covers login for every demo account, registration, password reset, tok
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE.md) · [API](docs/API.md) · [RBAC](docs/RBAC.md)
-- [Client demo guide](docs/DEMO_GUIDE.md) · [Testing](docs/TESTING.md) · [Production readiness](docs/PRODUCTION_READINESS.md) · [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
+- [Client demo guide](docs/DEMO_GUIDE.md) · [Testing](docs/TESTING.md) · [Demo verification](docs/DEMO_VERIFICATION.md) · [Production readiness](docs/PRODUCTION_READINESS.md) · [Implementation plan](docs/IMPLEMENTATION_PLAN.md)

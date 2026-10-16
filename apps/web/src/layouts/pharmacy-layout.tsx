@@ -6,6 +6,7 @@ export function PharmacyLayout() {
   const user = useCurrentUser();
   const logout = useLogout();
   const navigate = useNavigate();
+  const membership = user?.memberships.find((item) => item.organizationType === 'PHARMACY');
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="flex flex-wrap items-center justify-between gap-3 border-b bg-card px-6 py-4">
@@ -28,6 +29,13 @@ export function PharmacyLayout() {
           <p className="mt-4 text-xs text-muted-foreground">Demo workspace. Payments and delivery are simulated.</p>
         </aside>
         <main className="min-w-0 flex-1">
+          {membership && membership.approvalStatus !== 'APPROVED' && (
+            <p role="status" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              {membership.approvalStatus === 'REJECTED'
+                ? 'Your pharmacy registration was not approved. Contact the platform team for details.'
+                : 'Pending approval: your pharmacy will appear in patient search after the platform team approves your registration.'}
+            </p>
+          )}
           <Outlet />
         </main>
       </div>

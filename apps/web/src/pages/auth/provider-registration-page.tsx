@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Building2, FileText, Hospital, Pill, Stethoscope } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ApiError } from '@/api/client';
@@ -26,4 +26,4 @@ export function ProviderRegistrationPage() {
       <section className="mt-6 border-t pt-6"><h2 className="flex items-center gap-2 font-semibold"><FileText className="h-4 w-4" />Mock registration document</h2><p className="mt-1 text-xs text-muted-foreground">Demo metadata only; no file is uploaded. Enter a PDF filename to attach it to the review.</p><Input className="mt-3 max-w-md" value={form.documentName} onChange={(e) => change('documentName', e.target.value)} placeholder={type === 'DOCTOR' ? 'medical-license.pdf' : 'registration-certificate.pdf'} /></section>{error && <p className="mt-5 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}<Button className="mt-6" disabled={!ready || pending} onClick={submit}>{pending ? 'Submitting…' : 'Submit for approval'}</Button><p className="mt-3 text-xs text-muted-foreground">For demonstration use only. Submitted documents and payments are simulated.</p></div>
   </div>;
 }
-function Field({ label, value, onChange, type = 'text', placeholder }: { label: string; value: string; onChange: (value: string) => void; type?: string; placeholder?: string }) { return <div><Label>{label}</Label><Input className="mt-1" type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} /></div>; }
+function Field({ label, value, onChange, type = 'text', placeholder }: { label: string; value: string; onChange: (value: string) => void; type?: string; placeholder?: string }) { const id = useId(); return <div><Label htmlFor={id}>{label}</Label><Input id={id} className="mt-1" type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} /></div>; }

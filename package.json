@@ -14,6 +14,7 @@
     "test": "pnpm -r test",
     "test:e2e": "pnpm --filter @carebridge/web test:e2e",
     "test:phase18": "pnpm typecheck && pnpm build && pnpm test && pnpm test:e2e",
+    "test:demo": "pnpm typecheck && pnpm build && pnpm test && pnpm test:e2e",
     "dev:api": "pnpm --filter @carebridge/api dev",
     "db:generate": "pnpm --filter @carebridge/api db:generate",
     "db:migrate": "pnpm --filter @carebridge/api db:migrate",

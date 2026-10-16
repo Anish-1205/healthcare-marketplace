@@ -8,6 +8,7 @@ async function login(page: Page, account: string) {
 }
 
 async function capture(page: Page, name: string) {
+  await page.evaluate(() => window.scrollTo(0, 0));
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const path = test.info().outputPath(`${name}.png`);
   await page.screenshot({ path, fullPage: true });
@@ -58,7 +59,7 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
         expect(selected, 'A free slot within the next 14 days').toBe(true);
         await patient.getByRole('button', { name: 'Continue', exact: true }).click();
         await expect(patient).toHaveURL(/\/doctors\/[^/]+\/book$/);
-        await patient.getByPlaceholder('e.g. Recurring headaches for the past two weeks').fill('Phase 18 demo consultation');
+        await patient.getByPlaceholder('e.g. Recurring headaches for the past two weeks').fill('Demo verification consultation');
         const booked = patient.waitForResponse((r) => r.url().endsWith('/appointments') && r.request().method() === 'POST');
         await patient.getByRole('button', { name: /Pay .* & confirm/ }).click();
         const response = await booked;

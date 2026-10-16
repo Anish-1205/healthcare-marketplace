@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { API_PORT, API_URL, WEB_PORT, WEB_URL } from './e2e/environment';
 
 // Playwright needs taskkill to stop child servers on Windows, including IDE shells
 // whose PATH omits System32.
@@ -11,7 +12,7 @@ export default defineConfig({
   workers: 1,
   timeout: 30_000,
   use: {
-    baseURL: 'http://127.0.0.1:5174',
+    baseURL: WEB_URL,
     channel: 'msedge',
     headless: true,
     trace: 'retain-on-failure',
@@ -19,15 +20,15 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm --dir ../api exec tsx src/server.ts',
-      url: 'http://127.0.0.1:4001/api/v1/health',
-      env: { PORT: '4001', DATABASE_URL: process.env.TEST_DATABASE_URL ?? 'postgresql://carebridge:carebridge@localhost:5433/carebridge_test?schema=public', CORS_ORIGIN: 'http://127.0.0.1:5174', LOG_REQUESTS: 'false' },
+      url: `${API_URL}/health`,
+      env: { PORT: String(API_PORT), DATABASE_URL: process.env.TEST_DATABASE_URL ?? 'postgresql://carebridge:carebridge@localhost:5433/carebridge_test?schema=public', CORS_ORIGIN: WEB_URL, LOG_REQUESTS: 'false' },
       reuseExistingServer: false,
       timeout: 30_000,
     },
     {
-      command: 'pnpm dev --host 127.0.0.1 --port 5174 --strictPort',
-      url: 'http://127.0.0.1:5174',
-      env: { VITE_API_URL: 'http://127.0.0.1:4001/api/v1' },
+      command: `pnpm dev --host 127.0.0.1 --port ${WEB_PORT} --strictPort`,
+      url: WEB_URL,
+      env: { VITE_API_URL: API_URL },
       reuseExistingServer: false,
       timeout: 30_000,
     },

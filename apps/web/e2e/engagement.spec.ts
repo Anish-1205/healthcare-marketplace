@@ -1,3 +1,4 @@
+import { API_URL as API, WEB_URL } from './environment';
 import { expect, test, type Page } from '@playwright/test';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -7,7 +8,7 @@ const requireApi = createRequire(path.resolve(process.cwd(), '../api/package.jso
 function fixture(input: object) {
   execFileSync(process.execPath, [requireApi.resolve('tsx/cli'), 'tests/engagement-fixture.ts', JSON.stringify(input)], { cwd: path.resolve(process.cwd(), '../api'), env: process.env, stdio: 'pipe', timeout: 20_000 });
 }
-const API = 'http://127.0.0.1:4001/api/v1';
+
 async function login(page: Page, email: string, password: string) {
   await page.goto('/login');
   await page.getByLabel('Email', { exact: true }).fill(email);
@@ -51,7 +52,7 @@ for (const targetType of ['DOCTOR', 'CLINIC', 'HOSPITAL', 'PHARMACY']) {
       await expect(page.getByRole('status')).toContainText('pending');
       const publicPending = await request.get(`${API}/reviews`, { params: target });
       expect((await publicPending.json()).data.some((r: { id: string }) => r.id === review.id)).toBe(false);
-      const adminContext = await browser.newContext({ baseURL: 'http://127.0.0.1:5174' });
+      const adminContext = await browser.newContext({ baseURL: WEB_URL });
       try {
         const adminPage = await adminContext.newPage();
         await login(adminPage, 'admin@carebridge.demo', 'Demo@123');
