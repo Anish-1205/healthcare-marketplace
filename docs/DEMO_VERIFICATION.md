@@ -42,7 +42,7 @@ This was automated browser interaction plus screenshot inspection. A human prese
 
 - **Scenario 2 cannot be presented in full:** pharmacy profile, delivery settings and inventory management are absent. The pharmacy portal currently provides orders and delivery processing. Other pharmacy pages listed in the master prompt (dashboard, medicine management, customers and reports) are also absent.
 - **Phase 17 remains partial.** Its deferred UI work is recorded in the implementation plan. This verification pass does not close that phase.
-- Dashboard charts currently use CSS bars instead of the master prompt's specified Recharts library.
+- Dashboard charts now use Recharts (clinic dashboard/reports, admin overview/reports; loaded on demand). Doctor and pharmacy portals have KPI tiles but no charts.
 - A clean-machine setup and human presenter rehearsal remain unverified. On this Windows machine the default database and browser ports were unavailable; the checks used alternative ports as described below.
 - Production builds retain non-failing dependency annotation and bundle-size warnings. Prisma also warns that its package.json configuration is deprecated for a future major version.
 

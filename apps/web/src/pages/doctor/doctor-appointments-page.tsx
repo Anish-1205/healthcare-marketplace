@@ -46,7 +46,7 @@ export function DoctorAppointmentsPage() {
               }}
               className={cn(
                 'rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors',
-                scope === tab.value ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted',
+                scope === tab.value ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground interactive-row',
               )}
             >
               {tab.label}

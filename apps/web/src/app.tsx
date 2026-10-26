@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'motion/react';
 import { RouterProvider } from 'react-router-dom';
 import { queryClient } from '@/api/query-client';
 import { useIsAuthenticated, useMe } from '@/hooks/use-auth';
@@ -15,7 +16,9 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthBootstrap />
-      <RouterProvider router={router} />
+      <MotionConfig reducedMotion="user">
+        <RouterProvider router={router} />
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

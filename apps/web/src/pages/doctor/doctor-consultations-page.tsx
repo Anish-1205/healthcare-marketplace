@@ -37,7 +37,7 @@ export function DoctorConsultationsPage() {
             }}
             className={cn(
               'rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors',
-              scope === tab.value ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted',
+              scope === tab.value ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground interactive-row',
             )}
           >
             {tab.label}
@@ -66,7 +66,7 @@ export function DoctorConsultationsPage() {
               <Link
                 key={consultation.id}
                 to={`/doctor/consultations/${consultation.id}`}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm hover:shadow-md"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft interactive-card"
               >
                 <div className="flex items-center gap-3">
                   <Avatar

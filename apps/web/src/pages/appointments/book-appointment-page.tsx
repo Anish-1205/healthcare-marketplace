@@ -80,7 +80,7 @@ export function BookAppointmentPage() {
 
   return (
     <div className="container py-8">
-      <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">Book an appointment</h1>
+      <h1 className="font-display text-3xl font-normal text-foreground sm:text-4xl">Book an appointment</h1>
       <p className="mt-1.5 text-sm text-muted-foreground">Confirm your slot and payment. Payments in this demo are simulated.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -125,7 +125,7 @@ export function BookAppointmentPage() {
                   type="button"
                   onClick={() => setPaymentMethod(method.value)}
                   className={`flex flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left ${
-                    paymentMethod === method.value ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-muted'
+                    paymentMethod === method.value ? 'border-primary bg-accent text-accent-foreground' : 'border-border interactive-row'
                   }`}
                 >
                   <span className="flex items-center gap-2 text-sm font-semibold">

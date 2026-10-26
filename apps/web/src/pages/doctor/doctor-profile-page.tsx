@@ -152,7 +152,7 @@ export function DoctorProfilePage() {
                   onClick={() => toggleSpecialty(specialty.slug)}
                   className={cn(
                     'rounded-full border px-3 py-1.5 text-sm font-medium',
-                    specialtySlugs.includes(specialty.slug) ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground hover:bg-muted',
+                    specialtySlugs.includes(specialty.slug) ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground interactive-row',
                   )}
                 >
                   {specialty.name}
@@ -179,7 +179,7 @@ export function DoctorProfilePage() {
                       onClick={() => toggleConsultationType(type)}
                       className={cn(
                         'rounded-full border px-3 py-1.5 text-sm font-medium',
-                        consultationTypes.includes(type) ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground hover:bg-muted',
+                        consultationTypes.includes(type) ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground interactive-row',
                       )}
                     >
                       {CONSULTATION_TYPE_LABELS[type]}

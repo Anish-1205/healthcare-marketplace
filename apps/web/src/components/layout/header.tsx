@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Bell, ClipboardList, FlaskConical, LogOut, Menu, Pill, ShoppingCart, Stethoscope, User, X } from 'lucide-react';
+import { Bell, ClipboardList, FlaskConical, Menu, Pill, ShoppingCart, Stethoscope, User, X } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { GlobalSearch } from '@/components/global-search';
 import { Logo } from '@/components/logo';
-import { useCurrentUser, useLogout } from '@/hooks/use-auth';
+import { useCurrentUser } from '@/hooks/use-auth';
+import { UserMenu } from './user-menu';
 import { useCartCount } from '@/hooks/use-cart';
 import { useUnreadNotificationCount } from '@/hooks/use-notifications';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,7 @@ function NavItem({ href, label }: { href: string; label: string }) {
     <NavLink
       to={href}
       className={({ isActive }) =>
-        cn('rounded-full px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-accent-foreground', isActive && 'bg-accent text-accent-foreground')
+        cn('nav-underline rounded-full px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:text-primary', isActive && 'is-active text-primary')
       }
     >
       {label}
@@ -39,7 +40,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-white/95 backdrop-blur">
       <div className="container flex h-16 items-center gap-1 sm:gap-4">
-        <button className="rounded-lg p-2 hover:bg-accent lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+        <button className="rounded-lg p-2 interactive-pill lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </button>
         <Logo className="shrink-0" />
@@ -53,7 +54,7 @@ export function Header() {
         <div className="hidden flex-1 max-w-xs xl:block" />
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          <button className="rounded-full p-2 text-muted-foreground hover:bg-accent md:hidden" aria-label="Search" onClick={() => setMobileSearchOpen(true)}>
+          <button className="rounded-full p-2 text-muted-foreground interactive-pill md:hidden" aria-label="Search" onClick={() => setMobileSearchOpen(true)}>
             <SearchIcon />
           </button>
 
@@ -75,7 +76,7 @@ export function Header() {
         <div className="border-t border-border bg-white p-3 md:hidden">
           <div className="flex items-center gap-2">
             <GlobalSearch className="flex-1" autoFocus onNavigate={() => setMobileSearchOpen(false)} />
-            <button onClick={() => setMobileSearchOpen(false)} className="rounded-full p-2 hover:bg-accent" aria-label="Close search">
+            <button onClick={() => setMobileSearchOpen(false)} className="rounded-full p-2 interactive-pill" aria-label="Close search">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -99,7 +100,7 @@ function SearchIcon() {
 function HeaderIconLink({ href, icon: Icon, badge, label }: { href: string; icon: typeof ShoppingCart; badge?: number; label: string }) {
   const navigate = useNavigate();
   return (
-    <button onClick={() => navigate(href)} className="relative rounded-full p-2.5 text-foreground/80 hover:bg-accent" aria-label={label}>
+    <button onClick={() => navigate(href)} className="relative rounded-full p-2.5 text-foreground/80 interactive-pill" aria-label={label}>
       <Icon className="h-5 w-5" />
       {!!badge && (
         <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
@@ -114,7 +115,7 @@ function NotificationBell() {
   const { data } = useUnreadNotificationCount();
   const navigate = useNavigate();
   return (
-    <button onClick={() => navigate('/notifications')} className="relative rounded-full p-2.5 text-foreground/80 hover:bg-accent" aria-label="Notifications">
+    <button onClick={() => navigate('/notifications')} className="relative rounded-full p-2.5 text-foreground/80 interactive-pill" aria-label="Notifications">
       <Bell className="h-5 w-5" />
       {!!data?.count && (
         <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
@@ -125,12 +126,15 @@ function NotificationBell() {
   );
 }
 
+const PATIENT_LINKS = [
+  { label: 'My Profile', href: '/profile', icon: User },
+  { label: 'My Appointments', href: '/appointments', icon: Stethoscope },
+  { label: 'My Orders', href: '/orders', icon: ClipboardList },
+];
+
 function ProfileMenu() {
   const user = useCurrentUser();
-  const logout = useLogout();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-
   if (!user) {
     return (
       <Button size="sm" onClick={() => navigate('/login')} className="ml-1">
@@ -138,60 +142,7 @@ function ProfileMenu() {
       </Button>
     );
   }
-
-  return (
-    <div className="relative">
-      <button onClick={() => setOpen((v) => !v)} className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 hover:bg-accent" aria-label="Profile menu">
-        <Avatar firstName={user.firstName} lastName={user.lastName} imageUrl={user.avatarUrl} size="sm" />
-        <span className="hidden text-sm font-medium sm:block">{user.firstName}</span>
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-56 rounded-2xl border border-border bg-white p-1.5 shadow-xl">
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate('/profile');
-              }}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-accent"
-            >
-              <User className="h-4 w-4" /> My Profile
-            </button>
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate('/appointments');
-              }}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-accent"
-            >
-              <Stethoscope className="h-4 w-4" /> My Appointments
-            </button>
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate('/orders');
-              }}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-accent"
-            >
-              <ClipboardList className="h-4 w-4" /> My Orders
-            </button>
-            <div className="my-1 h-px bg-border" />
-            <button
-              onClick={() => {
-                setOpen(false);
-                logout.mutate();
-                navigate('/');
-              }}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm text-destructive hover:bg-destructive/10"
-            >
-              <LogOut className="h-4 w-4" /> Sign Out
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
+  return <UserMenu links={PATIENT_LINKS} />;
 }
 
 function MobileNav({ onClose }: { onClose: () => void }) {
@@ -202,7 +153,7 @@ function MobileNav({ onClose }: { onClose: () => void }) {
       <div className="absolute left-0 top-0 h-full w-72 bg-white p-5 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
           <Logo />
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-accent" aria-label="Close menu">
+          <button onClick={onClose} className="rounded-full p-2 interactive-pill" aria-label="Close menu">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -223,12 +174,12 @@ function MobileNav({ onClose }: { onClose: () => void }) {
               key={link.href}
               to={link.href}
               onClick={onClose}
-              className={({ isActive }) => cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium', isActive ? 'bg-accent text-accent-foreground' : 'text-foreground hover:bg-accent')}
+              className={({ isActive }) => cn('flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium', isActive ? 'bg-accent text-accent-foreground' : 'text-foreground interactive-row')}
             >
               <link.icon className="h-4.5 w-4.5" /> {link.label}
             </NavLink>
           ))}
-          <NavLink to="/health-records" onClick={onClose} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-accent">
+          <NavLink to="/health-records" onClick={onClose} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground interactive-row">
             <ClipboardList className="h-4.5 w-4.5" /> Health Records
           </NavLink>
         </nav>

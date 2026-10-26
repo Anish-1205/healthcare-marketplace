@@ -1,3 +1,4 @@
+import { PageTransition } from '@/components/motion';
 import { Outlet } from 'react-router-dom';
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
@@ -9,7 +10,9 @@ export function PublicLayout() {
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex-1">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
       <MobileBottomNav />

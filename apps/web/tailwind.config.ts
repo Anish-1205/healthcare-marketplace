@@ -57,14 +57,26 @@ export default {
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Instrument Serif"', 'ui-serif', 'Georgia', 'serif'],
+      },
+      boxShadow: {
+        soft: '0 1px 2px hsl(200 40% 12% / 0.04), 0 8px 24px -12px hsl(200 40% 12% / 0.10)',
+        lift: '0 2px 4px hsl(200 40% 12% / 0.05), 0 24px 48px -20px hsl(189 60% 20% / 0.28)',
+        glow: '0 0 0 1px hsl(0 0% 100% / 0.5) inset, 0 20px 60px -24px hsl(189 75% 26% / 0.45)',
       },
       keyframes: {
         'accordion-down': { from: { height: '0' }, to: { height: 'var(--radix-accordion-content-height)' } },
         'accordion-up': { from: { height: 'var(--radix-accordion-content-height)' }, to: { height: '0' } },
+        marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
+        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+        pulse_ring: { '0%': { transform: 'scale(0.8)', opacity: '0.7' }, '100%': { transform: 'scale(2.2)', opacity: '0' } },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        marquee: 'marquee 40s linear infinite',
+        float: 'float 6s ease-in-out infinite',
+        'pulse-ring': 'pulse_ring 2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite',
       },
     },
   },

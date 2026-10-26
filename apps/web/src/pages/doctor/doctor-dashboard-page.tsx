@@ -1,6 +1,7 @@
 import { CalendarClock, CheckCircle2, ClipboardList, FileWarning, Hourglass, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DoctorAppointmentRow } from '@/components/doctor/doctor-appointment-row';
+import { CountUp, Stagger, StaggerItem } from '@/components/motion';
 import { EmptyState } from '@/components/empty-state';
 import { ErrorState } from '@/components/error-state';
 import { Avatar } from '@/components/ui/avatar';
@@ -30,13 +31,15 @@ function StatTile({ icon: Icon, label, value, tone }: { icon: typeof Users; labe
     muted: 'bg-muted text-muted-foreground',
   };
   return (
-    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <span className={cn('flex h-9 w-9 items-center justify-center rounded-xl', toneClasses[tone])}>
-        <Icon className="h-4.5 w-4.5" />
-      </span>
-      <p className="mt-3 text-2xl font-extrabold text-foreground">{value}</p>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-    </div>
+    <StaggerItem>
+      <div className="group h-full rounded-2xl border border-border/70 bg-card p-4 shadow-soft interactive-card">
+        <span className={cn('flex h-9 w-9 items-center justify-center rounded-xl', toneClasses[tone])}>
+          <Icon className="h-4.5 w-4.5" />
+        </span>
+        <p className="mt-3 text-2xl font-extrabold tabular-nums text-foreground"><CountUp value={value} /></p>
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      </div>
+    </StaggerItem>
   );
 }
 
@@ -66,7 +69,7 @@ export function DoctorDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">
+        <h1 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
           {greeting()}, Dr. {user?.lastName}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -74,14 +77,14 @@ export function DoctorDashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <Stagger className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile icon={CalendarClock} label="Today's Appointments" value={stats.todayAppointments} tone="primary" />
         <StatTile icon={Hourglass} label="Upcoming" value={stats.upcomingAppointments} tone="secondary" />
         <StatTile icon={Users} label="Waiting Patients" value={stats.waitingPatients} tone="warning" />
         <StatTile icon={CheckCircle2} label="Completed Today" value={stats.completedConsultationsToday} tone="accent" />
         <StatTile icon={ClipboardList} label="Total Patients" value={stats.totalPatients} tone="muted" />
         <StatTile icon={FileWarning} label="Pending Notes" value={stats.pendingNotes} tone="destructive" />
-      </div>
+      </Stagger>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
@@ -130,7 +133,7 @@ export function DoctorDashboardPage() {
                 <Link
                   key={patient.patientId}
                   to={`/doctor/patients/${patient.patientId}`}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-sm hover:bg-muted"
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft interactive-card"
                 >
                   <Avatar firstName={patient.name.split(' ')[0]} lastName={patient.name.split(' ').slice(1).join(' ')} imageUrl={patient.avatarUrl} size="sm" />
                   <div className="min-w-0 flex-1">

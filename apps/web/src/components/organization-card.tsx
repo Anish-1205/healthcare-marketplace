@@ -1,3 +1,4 @@
+import { RevealCard } from '@/components/motion';
 import type { OrganizationSummary } from '@carebridge/shared';
 import { FavoriteButton } from './favorite-button';
 import { Building2, Clock, MapPin, Truck } from 'lucide-react';
@@ -13,7 +14,8 @@ export function OrganizationCard({ organization, className }: { organization: Or
   const hue = avatarHue(organization.name);
 
   return (
-    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md', className)}>
+    <RevealCard className="h-full">
+    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft interactive-card', className)}>
       <div className="flex items-start gap-3">
         {organization.logoUrl ? (
           <img src={organization.logoUrl} alt={organization.name} className="h-12 w-12 rounded-xl object-cover" />
@@ -80,5 +82,6 @@ export function OrganizationCard({ organization, className }: { organization: Or
         {isPharmacy ? 'Select Pharmacy' : 'View Details'}
       </Link>
     </div>
+    </RevealCard>
   );
 }

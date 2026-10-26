@@ -42,7 +42,7 @@ export function PrescriptionsPage() {
         <>
           <div className="space-y-4">
             {data.data.map((prescription) => (
-              <div key={prescription.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div key={prescription.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft interactive-card">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex gap-3.5">
                     <Avatar

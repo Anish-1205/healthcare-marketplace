@@ -160,7 +160,7 @@ export function DoctorAvailabilityPage() {
                 onClick={() => setActiveContext(context.key)}
                 className={cn(
                   'rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors',
-                  activeContext === context.key ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:bg-muted',
+                  activeContext === context.key ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground interactive-row',
                 )}
               >
                 {context.label}

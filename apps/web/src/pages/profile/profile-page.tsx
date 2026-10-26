@@ -173,7 +173,7 @@ export function ProfilePage() {
           </div>
         </section>
 
-        <Link to="/profile/addresses" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm hover:bg-muted/40">
+        <Link to="/profile/addresses" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-5 shadow-soft interactive-card">
           <MapPin className="h-5 w-5 text-primary" />
           <span className="flex-1 text-sm font-semibold text-foreground">Saved addresses</span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />

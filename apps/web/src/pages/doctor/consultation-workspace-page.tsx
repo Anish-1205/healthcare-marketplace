@@ -135,7 +135,7 @@ export function ConsultationWorkspacePage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-foreground">Consultation</h1>
+          <h1 className="font-display text-3xl font-normal text-foreground">Consultation</h1>
           <p className="mt-1 flex flex-wrap items-center gap-x-3 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <CalendarClock className="h-4 w-4" /> {formatSlotLabel(consultation.scheduledStart)}
@@ -219,7 +219,7 @@ export function ConsultationWorkspacePage() {
               <ul className="space-y-2">
                 {consultation.previousPrescriptions.map((prescription) => (
                   <li key={prescription.id}>
-                    <Link to={`/doctor/prescriptions/${prescription.id}`} className="block rounded-xl border border-border p-2.5 hover:bg-muted">
+                    <Link to={`/doctor/prescriptions/${prescription.id}`} className="block rounded-xl border border-border p-2.5 interactive-row">
                       <p className="font-mono text-xs text-muted-foreground">{prescription.prescriptionNumber}</p>
                       <p className="text-sm font-medium text-foreground">{prescription.diagnosis ?? 'Prescription'}</p>
                       <p className="text-xs text-muted-foreground">

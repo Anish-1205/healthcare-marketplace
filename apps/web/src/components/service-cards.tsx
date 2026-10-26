@@ -20,7 +20,7 @@ export function ServiceCards() {
           <Link
             key={service.id}
             to={service.href}
-            className={cn('group flex flex-col gap-4 rounded-2xl p-6 shadow-sm transition-transform hover:-translate-y-1', SURFACE_CLASS[service.surface])}
+            className={cn('group flex flex-col gap-4 rounded-2xl p-6 shadow-sm shadow-soft interactive-card', SURFACE_CLASS[service.surface])}
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/70 shadow-sm">
               <Icon className="h-6 w-6" />

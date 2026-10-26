@@ -76,7 +76,7 @@ export function GlobalSearch({ className, autoFocus = false, onNavigate }: { cla
             type="button"
             aria-label="Clear search"
             onClick={() => setQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-muted"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground interactive-pill"
           >
             {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
           </button>
@@ -105,7 +105,7 @@ export function GlobalSearch({ className, autoFocus = false, onNavigate }: { cla
                     key={`${item.type}-${item.id}`}
                     type="button"
                     onClick={() => go(item.href)}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-accent"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left interactive-row"
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
                       <Icon className="h-4.5 w-4.5" />

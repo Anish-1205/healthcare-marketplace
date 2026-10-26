@@ -1,3 +1,4 @@
+import { RevealCard } from '@/components/motion';
 import { Link } from 'react-router-dom';
 import type { MedicineCategoryRef } from '@/api/reference';
 import { iconFor } from '@/lib/icon-map';
@@ -17,9 +18,10 @@ export function CategoryCard({ category, className }: { category: MedicineCatego
     ? 'border border-border bg-card text-foreground shadow-sm'
     : (SURFACE_CLASS[category.colorTheme ?? 'mint'] ?? SURFACE_CLASS.mint);
   return (
+    <RevealCard className="h-full">
     <Link
       to={`/medicine-categories/${category.slug}`}
-      className={cn('group flex flex-col items-center gap-3 rounded-2xl p-5 text-center transition-transform hover:-translate-y-0.5', category.imageUrl && 'p-3', surface, className)}
+      className={cn('group flex flex-col items-center gap-3 rounded-2xl p-5 text-center shadow-soft interactive-card', category.imageUrl && 'p-3', surface, className)}
     >
       {category.imageUrl ? (
         <img src={category.imageUrl} alt="" className="aspect-[4/3] w-full object-contain" />
@@ -33,5 +35,6 @@ export function CategoryCard({ category, className }: { category: MedicineCatego
         <p className="text-xs opacity-70">{category.medicineCount} products</p>
       </div>
     </Link>
+    </RevealCard>
   );
 }

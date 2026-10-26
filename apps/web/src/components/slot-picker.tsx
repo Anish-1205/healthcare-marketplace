@@ -56,7 +56,7 @@ export function SlotPicker({
               <button
                 key={t}
                 onClick={() => setType(t)}
-                className={cn('flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium', type === t ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground hover:bg-muted')}
+                className={cn('flex flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium', type === t ? 'border-primary bg-accent text-accent-foreground' : 'border-border text-muted-foreground interactive-row')}
               >
                 <meta.icon className="h-4 w-4" /> {meta.label}
               </button>
@@ -73,7 +73,7 @@ export function SlotPicker({
             <button
               key={iso}
               onClick={() => onSelectDate(iso)}
-              className={cn('flex w-16 shrink-0 flex-col items-center rounded-xl border px-2 py-2.5', isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-muted')}
+              className={cn('flex w-16 shrink-0 flex-col items-center rounded-xl border px-2 py-2.5', isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border interactive-row')}
             >
               <span className="text-[11px] font-medium uppercase opacity-80">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
               <span className="text-base font-bold">{date.getDate()}</span>
@@ -109,7 +109,7 @@ export function SlotPicker({
               <button
                 key={slot.start}
                 onClick={() => onSelectSlot({ ...slot, consultationTypes: [type] })}
-                className={cn('rounded-xl border px-2 py-2.5 text-sm font-medium', isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-muted')}
+                className={cn('rounded-xl border px-2 py-2.5 text-sm font-medium', isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border interactive-row')}
               >
                 {time}
               </button>

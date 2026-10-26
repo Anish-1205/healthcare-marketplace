@@ -90,7 +90,7 @@ export function DoctorDetailPage() {
                     <Link
                       key={org.organizationId}
                       to={`/organizations/${org.organizationSlug}`}
-                      className="flex items-center justify-between rounded-xl border border-border p-3 hover:bg-muted"
+                      className="flex items-center justify-between rounded-xl border border-border p-3 interactive-row"
                     >
                       <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Building2 className="h-4 w-4 text-muted-foreground" /> {org.organizationName}

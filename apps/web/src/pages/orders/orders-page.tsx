@@ -60,7 +60,7 @@ export function OrdersPage({ pharmacy = false }: { pharmacy?: boolean }) {
             <Link
               key={order.id}
               to={`${pharmacy ? '/pharmacy' : ''}/orders/${order.id}`}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm hover:border-primary"
+              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card p-5 shadow-soft interactive-card"
             >
               <div>
                 <p className="font-semibold">{order.orderNumber}</p>

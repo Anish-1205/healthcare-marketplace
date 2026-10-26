@@ -49,22 +49,18 @@ import { OrganizationDetailPage } from '@/pages/organizations/organization-detai
 import { OrganizationsPage } from '@/pages/organizations/organizations-page';
 import { PharmacyDetailPage } from '@/pages/pharmacies/pharmacy-detail-page';
 import { PharmaciesPage } from '@/pages/pharmacies/pharmacies-page';
-import { OrganizationDashboardPage } from '@/pages/organization/organization-dashboard-page';
 import { OrganizationDoctorsPage } from '@/pages/organization/organization-doctors-page';
 import { OrganizationAppointmentsPage } from '@/pages/organization/organization-appointments-page';
 import { OrganizationPatientsPage } from '@/pages/organization/organization-patients-page';
 import { OrganizationServicesPage } from '@/pages/organization/organization-services-page';
 import { OrganizationStaffPage } from '@/pages/organization/organization-staff-page';
 import { OrganizationSchedulesPage } from '@/pages/organization/organization-schedules-page';
-import { OrganizationReportsPage } from '@/pages/organization/organization-reports-page';
 import { OrganizationProfilePage } from '@/pages/organization/organization-profile-page';
-import { AdminDashboardPage } from '@/pages/admin/admin-dashboard-page';
 import { AdminOrganizationsPage, AdminDoctorsPage, AdminPatientsPage } from '@/pages/admin/admin-entities-page';
 import { AdminOrganizationDetailPage, AdminDoctorDetailPage, AdminPatientDetailPage } from '@/pages/admin/admin-entity-detail-page';
 import { AdminAppointmentsPage, AdminOrdersPage } from '@/pages/admin/admin-transactions-page';
 import { AdminApprovalsPage } from '@/pages/admin/admin-approvals-page';
 import { AdminEmployeesPage } from '@/pages/admin/admin-employees-page';
-import { AdminReportsPage } from '@/pages/admin/admin-reports-page';
 import { AdminActivityPage } from '@/pages/admin/admin-activity-page';
 import { AdminSettingsPage } from '@/pages/admin/admin-settings-page';
 import { LabTestsPage } from '@/pages/labs/lab-tests-page';
@@ -73,6 +69,7 @@ import { LabBookingsPage } from '@/pages/labs/lab-bookings-page';
 import { LabBookingDetailPage } from '@/pages/labs/lab-booking-detail-page';
 import { HealthRecordsPage } from '@/pages/health-records/health-records-page';
 
+// Chart pages load on demand so Recharts stays out of the public bundle.
 export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
@@ -154,7 +151,7 @@ export const router = createBrowserRouter([
     children: [{
       element: <OrganizationLayout />,
       children: [
-        { path: '/organization', element: <OrganizationDashboardPage /> },
+        { path: '/organization', lazy: () => import('@/pages/organization/organization-dashboard-page').then((m) => ({ Component: m.OrganizationDashboardPage })) },
         { path: '/organization/doctors', element: <OrganizationDoctorsPage /> },
         { path: '/organization/appointments', element: <OrganizationAppointmentsPage /> },
         { path: '/organization/appointments/:id', element: <DoctorAppointmentDetailPage portal="organization" /> },
@@ -162,7 +159,7 @@ export const router = createBrowserRouter([
         { path: '/organization/services', element: <OrganizationServicesPage /> },
         { path: '/organization/staff', element: <OrganizationStaffPage /> },
         { path: '/organization/schedules', element: <OrganizationSchedulesPage /> },
-        { path: '/organization/reports', element: <OrganizationReportsPage /> },
+        { path: '/organization/reports', lazy: () => import('@/pages/organization/organization-reports-page').then((m) => ({ Component: m.OrganizationReportsPage })) },
         { path: '/organization/profile', element: <OrganizationProfilePage /> },
       ],
     }],
@@ -172,7 +169,7 @@ export const router = createBrowserRouter([
     children: [{
       element: <AdminLayout />,
       children: [
-        { path: '/admin', element: <AdminDashboardPage /> },
+        { path: '/admin', lazy: () => import('@/pages/admin/admin-dashboard-page').then((m) => ({ Component: m.AdminDashboardPage })) },
         { path: '/admin/organizations', element: <AdminOrganizationsPage /> },
         { path: '/admin/organizations/:id', element: <AdminOrganizationDetailPage /> },
         { path: '/admin/doctors', element: <AdminDoctorsPage /> },
@@ -184,7 +181,7 @@ export const router = createBrowserRouter([
         { path: '/admin/orders', element: <AdminOrdersPage /> },
         { path: '/admin/approvals', element: <AdminApprovalsPage /> },
         { element: <RequirePermission permission="review.moderate" />, children: [{ path: '/admin/reviews', element: <AdminReviewsPage /> }] },
-        { path: '/admin/reports', element: <AdminReportsPage /> },
+        { path: '/admin/reports', lazy: () => import('@/pages/admin/admin-reports-page').then((m) => ({ Component: m.AdminReportsPage })) },
         { path: '/admin/activity', element: <AdminActivityPage /> },
         { element: <RequirePermission permission="employee.manage" />, children: [{ path: '/admin/employees', element: <AdminEmployeesPage /> }] },
         { element: <RequirePermission permission="settings.manage" />, children: [{ path: '/admin/settings', element: <AdminSettingsPage /> }] },

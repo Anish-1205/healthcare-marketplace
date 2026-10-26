@@ -1,3 +1,4 @@
+import { RevealCard } from '@/components/motion';
 import type { MedicineSummary } from '@carebridge/shared';
 import { Pill } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -31,7 +32,8 @@ export function MedicineCard({ medicine, pharmacyId, className }: { medicine: Me
   }
 
   return (
-    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md', className)}>
+    <RevealCard className="h-full">
+    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-4 shadow-soft interactive-card', className)}>
       <Link to={`/medicines/${medicine.slug}`} className={cn('flex aspect-square items-center justify-center rounded-xl', !medicine.imageUrl && 'bg-mint')}>
         {medicine.imageUrl ? (
           <img src={medicine.imageUrl} alt={medicine.name} className="h-full w-full object-contain" />
@@ -99,5 +101,6 @@ export function MedicineCard({ medicine, pharmacyId, className }: { medicine: Me
       )}
       {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
     </div>
+    </RevealCard>
   );
 }

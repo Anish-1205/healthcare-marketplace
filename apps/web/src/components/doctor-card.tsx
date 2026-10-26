@@ -1,3 +1,4 @@
+import { RevealCard } from '@/components/motion';
 import type { DoctorSummary } from '@carebridge/shared';
 import { FavoriteButton } from './favorite-button';
 import { Building2, Calendar } from 'lucide-react';
@@ -11,7 +12,8 @@ import { cn, formatCurrency, formatSlotLabel } from '@/lib/utils';
 export function DoctorCard({ doctor, className }: { doctor: DoctorSummary; className?: string }) {
   const [firstName, ...rest] = doctor.name.replace('Dr. ', '').split(' ');
   return (
-    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md', className)}>
+    <RevealCard className="h-full">
+    <div className={cn('flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-soft interactive-card', className)}>
       <div className="flex items-start gap-3">
         <Avatar firstName={firstName} lastName={rest.join(' ')} imageUrl={doctor.avatarUrl} size="lg" />
         <div className="min-w-0 flex-1">
@@ -49,15 +51,16 @@ export function DoctorCard({ doctor, className }: { doctor: DoctorSummary; class
         )}
       </div>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <FavoriteButton targetType="DOCTOR" targetId={doctor.id} />
-        <Link to={`/doctors/${doctor.slug}`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'flex-1')}>
+        <Link to={`/doctors/${doctor.slug}`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'min-w-[7.5rem] flex-1')}>
           View Profile
         </Link>
-        <Link to={`/doctors/${doctor.slug}?book=1`} className={cn(buttonVariants({ size: 'sm' }), 'flex-1')}>
+        <Link to={`/doctors/${doctor.slug}?book=1`} className={cn(buttonVariants({ size: 'sm' }), 'min-w-[9.5rem] flex-1')}>
           Book Appointment
         </Link>
       </div>
     </div>
+    </RevealCard>
   );
 }

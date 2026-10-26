@@ -1,3 +1,5 @@
+import { UserMenu } from '@/components/layout/user-menu';
+import { PageTransition } from '@/components/motion';
 import { useState } from 'react';
 import {
   AlertTriangle,
@@ -11,10 +13,10 @@ import {
   Stethoscope,
   User,
   Users,
+  UserRound,
   X,
 } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Avatar } from '@/components/ui/avatar';
 import { Logo } from '@/components/logo';
 import { useCurrentUser, useLogout } from '@/hooks/use-auth';
 import { useUnreadNotificationCount } from '@/hooks/use-notifications';
@@ -43,7 +45,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           className={({ isActive }) =>
             cn(
               'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-              isActive ? 'bg-primary text-primary-foreground' : 'text-foreground/80 hover:bg-accent hover:text-accent-foreground',
+              isActive ? 'bg-primary text-primary-foreground' : 'text-foreground/80 interactive-row',
             )
           }
         >
@@ -91,10 +93,7 @@ export function DoctorLayout() {
         </div>
         <div className="border-t border-border p-3">
           <button
-            onClick={() => {
-              logout.mutate();
-              navigate('/login');
-            }}
+            onClick={() => logout.mutate()}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10"
           >
             <LogOut className="h-4.5 w-4.5" /> Sign out
@@ -108,7 +107,7 @@ export function DoctorLayout() {
           <div className="absolute left-0 top-0 flex h-full w-72 flex-col bg-white shadow-xl">
             <div className="flex h-16 items-center justify-between border-b border-border px-5">
               <Logo />
-              <button onClick={() => setMobileOpen(false)} className="rounded-full p-2 hover:bg-accent" aria-label="Close menu">
+              <button onClick={() => setMobileOpen(false)} className="rounded-full p-2 interactive-pill" aria-label="Close menu">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -121,12 +120,12 @@ export function DoctorLayout() {
 
       <div className="flex min-h-screen flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-white/95 px-4 backdrop-blur sm:px-6">
-          <button className="rounded-lg p-2 hover:bg-accent lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+          <button className="rounded-lg p-2 interactive-pill lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </button>
           <p className="flex-1 text-sm font-semibold text-foreground">Doctor Portal</p>
 
-          <button onClick={() => navigate('/doctor/notifications')} className="relative rounded-full p-2.5 text-foreground/80 hover:bg-accent" aria-label="Notifications">
+          <button onClick={() => navigate('/doctor/notifications')} className="relative rounded-full p-2.5 text-foreground/80 interactive-pill" aria-label="Notifications">
             <Bell className="h-5 w-5" />
             {!!unread?.count && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
@@ -136,17 +135,22 @@ export function DoctorLayout() {
           </button>
 
           {user && (
-            <button onClick={() => navigate('/doctor/profile')} className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 hover:bg-accent">
-              <Avatar firstName={user.firstName} lastName={user.lastName} imageUrl={user.avatarUrl} size="sm" />
-              <span className="hidden text-sm font-medium sm:block">Dr. {user.lastName}</span>
-            </button>
+            <UserMenu
+              displayName={`Dr. ${user.lastName}`}
+              links={[
+                { label: 'My Profile', href: '/doctor/profile', icon: UserRound },
+                { label: 'Notifications', href: '/doctor/notifications', icon: Bell },
+              ]}
+            />
           )}
         </header>
 
         <ApprovalBanner />
 
         <main className="flex-1 p-4 sm:p-6">
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
     </div>

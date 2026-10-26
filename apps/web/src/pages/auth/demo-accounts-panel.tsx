@@ -25,7 +25,7 @@ export function DemoAccountsPanel({ onSelect }: { onSelect: (account: DemoAccoun
               type="button"
               onClick={() => onSelect(account)}
               title={account.description}
-              className="truncate rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium text-foreground shadow-sm hover:border-primary hover:text-primary"
+              className="truncate rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium text-foreground shadow-soft interactive-card hover:text-primary"
             >
               {account.label}
             </button>

@@ -65,7 +65,7 @@ export function DoctorPatientsPage() {
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {data.data.map((patient) => (
-              <Link key={patient.patientId} to={`/doctor/patients/${patient.patientId}`} className="rounded-2xl border border-border bg-card p-4 shadow-sm hover:shadow-md">
+              <Link key={patient.patientId} to={`/doctor/patients/${patient.patientId}`} className="rounded-2xl border border-border bg-card p-4 shadow-soft interactive-card">
                 <div className="flex items-center gap-3">
                   <Avatar firstName={patient.name.split(' ')[0]} lastName={patient.name.split(' ').slice(1).join(' ')} imageUrl={patient.avatarUrl} />
                   <div className="min-w-0 flex-1">

@@ -9,7 +9,7 @@
  */
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 40 30% 98.5%;
     --foreground: 200 35% 12%;
 
     --card: 0 0% 100%;
@@ -21,7 +21,7 @@
     --secondary: 152 55% 38%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 200 20% 96%;
+    --muted: 40 18% 95%;
     --muted-foreground: 200 12% 42%;
 
     --accent: 189 60% 94%;
@@ -30,7 +30,7 @@
     --destructive: 4 78% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 20% 90%;
+    --border: 40 12% 89%;
     --input: 200 20% 88%;
     --ring: 189 75% 30%;
 
@@ -61,6 +61,14 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+
+  h1, h2 {
+    letter-spacing: -0.02em;
+  }
 }
 
 @layer utilities {
@@ -73,6 +81,116 @@
   }
   .text-balance {
     text-wrap: balance;
+  }
+  /* Soft aurora wash behind hero and CTA sections. */
+  .bg-aurora {
+    background:
+      radial-gradient(60% 50% at 15% 10%, hsl(189 70% 88% / 0.9) 0%, transparent 60%),
+      radial-gradient(45% 45% at 90% 20%, hsl(152 55% 88% / 0.8) 0%, transparent 60%),
+      radial-gradient(50% 60% at 60% 100%, hsl(40 70% 92% / 0.9) 0%, transparent 60%),
+      hsl(var(--background));
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .glass {
+    background: hsl(0 0% 100% / 0.7);
+    backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid hsl(0 0% 100% / 0.8);
+  }
+  .text-gradient {
+    background: linear-gradient(100deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .mask-fade-x {
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+}
+
+/*
+ * Shared hover language — every clickable surface uses one of these three, so interactions feel
+ * the same on every page: cards lift, rows tint, icon buttons pill.
+ */
+.interactive-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.interactive-card:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--primary) / 0.25);
+  box-shadow: 0 2px 4px hsl(200 40% 12% / 0.05), 0 24px 48px -20px hsl(189 60% 20% / 0.28);
+}
+.interactive-row,
+.divide-y > a,
+tbody tr {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.interactive-row:hover,
+.divide-y > a:hover,
+tbody tr:hover {
+  background-color: hsl(var(--accent) / 0.7);
+}
+.interactive-row:hover {
+  border-color: hsl(var(--primary) / 0.3);
+  color: hsl(var(--accent-foreground));
+}
+/* Divided list links get breathing room so the tint doesn't hug the text. */
+.divide-y > a {
+  margin-inline: -0.75rem;
+  padding-inline: 0.75rem;
+  border-radius: 0.75rem;
+}
+.interactive-pill {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+.interactive-pill:hover {
+  background-color: hsl(var(--accent));
+}
+.interactive-pill:active {
+  transform: scale(0.94);
+}
+
+/* Header links: an underline that grows from the centre. */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.3rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--secondary)));
+  transform: scaleX(0);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-underline:hover::after,
+.nav-underline.is-active::after {
+  transform: scaleX(1);
+}
+
+/* Loading placeholders sweep a soft highlight instead of blinking. */
+.skeleton-shimmer {
+  background: linear-gradient(100deg, hsl(var(--muted)) 30%, hsl(0 0% 100% / 0.85) 50%, hsl(var(--muted)) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer { animation: none; }
+  .interactive-card:hover { transform: none; }
+  .animate-marquee, .animate-float, .animate-pulse-ring {
+    animation: none;
   }
 }
 

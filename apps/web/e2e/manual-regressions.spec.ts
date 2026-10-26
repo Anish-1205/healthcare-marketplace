@@ -66,9 +66,12 @@ test.describe('manual regression walkthrough', () => {
   ] as const;
 
   for (const [label, destination] of accounts) {
-    test(`${label} lands in the correct portal`, async ({ page }) => {
+    test(`${label} lands in the correct portal and signs out to the login page`, async ({ page }) => {
       await loginAs(page, label);
       await expect(page).toHaveURL(new URL(destination, WEB_URL).toString());
+      await page.getByRole('button', { name: 'Account menu' }).click();
+      await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
+      await expect(page).toHaveURL(new URL('/login', WEB_URL).toString());
     });
   }
 

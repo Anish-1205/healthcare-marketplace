@@ -59,7 +59,8 @@ test('new pharmacy submits a document, receives approval and can sign in again',
     expect(approvedListing.ok()).toBe(true);
     expect((await approvedListing.json()).data.map((item: { id: string }) => item.id)).toContain(membership.organizationId);
 
-    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await page.getByRole('button', { name: 'Account menu' }).click();
+    await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.getByLabel('Email', { exact: true }).fill(email);
     await page.getByLabel('Password', { exact: true }).fill('Demo@123');

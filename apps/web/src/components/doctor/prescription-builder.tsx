@@ -32,7 +32,7 @@ function SuggestionRow({ options, onPick }: { options: string[]; onPick: (value:
           key={option}
           type="button"
           onClick={() => onPick(option)}
-          className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted"
+          className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground interactive-pill"
         >
           {option}
         </button>
@@ -62,7 +62,7 @@ function MedicinePicker({ onSelect }: { onSelect: (medicine: { id: string | null
             <button
               type="button"
               onClick={() => onSelect({ id: null, name: term.trim() })}
-              className="w-full rounded-xl border border-dashed border-border p-3 text-left text-sm text-muted-foreground hover:bg-muted"
+              className="w-full rounded-xl border border-dashed border-border p-3 text-left text-sm text-muted-foreground interactive-row"
             >
               Not in the catalogue — add “{term.trim()}” as typed
             </button>
@@ -72,7 +72,7 @@ function MedicinePicker({ onSelect }: { onSelect: (medicine: { id: string | null
                 key={medicine.id}
                 type="button"
                 onClick={() => onSelect({ id: medicine.id, name: `${medicine.name}${medicine.strength ? ` ${medicine.strength}` : ''}` })}
-                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border p-3 text-left hover:bg-muted"
+                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border p-3 text-left interactive-row"
               >
                 <span>
                   <span className="block text-sm font-semibold text-foreground">
@@ -225,7 +225,7 @@ export function PrescriptionBuilder({
             <div className="rounded-xl border border-primary/30 bg-accent/30 p-4">
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm font-semibold text-foreground">New medicine</p>
-                <button onClick={() => setDraftLine(null)} className="rounded-lg p-1 text-muted-foreground hover:bg-muted" aria-label="Cancel">
+                <button onClick={() => setDraftLine(null)} className="rounded-lg p-1 text-muted-foreground interactive-pill" aria-label="Cancel">
                   <X className="h-4 w-4" />
                 </button>
               </div>
