@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { prisma } from '../src/config/prisma';
+import { istDate } from '../src/utils/time';
 import { api, registerPatient, signIn } from './helpers';
 
 let patient: Awaited<ReturnType<typeof registerPatient>>;
@@ -149,6 +150,37 @@ describe('checkout', () => {
     expect((await status(placed.body.data.id, 'CONFIRMED')).status).toBe(409);
     expect((await status(placed.body.data.id, 'PRESCRIPTION_REVIEW')).status).toBe(200);
     expect((await status(placed.body.data.id, 'CONFIRMED')).status).toBe(200);
+  });
+  it('rejects expired prescriptions and caps cumulative quantity at what was prescribed', async () => {
+    const inventory = await prisma.pharmacyInventory.findFirstOrThrow({
+      where: { pharmacyId, isActive: true, stockQuantity: { gt: 5 }, medicine: { requiresPrescription: true, isActive: true } },
+      include: { medicine: true },
+    });
+    const doctor = await prisma.doctor.findFirstOrThrow();
+    const rx = await prisma.prescription.create({
+      data: {
+        prescriptionNumber: `TEST-${randomUUID()}`,
+        doctorId: doctor.id,
+        patientId: patient.user.patientId,
+        status: 'ISSUED',
+        validUntil: istDate(-1),
+        items: {
+          create: { medicineId: inventory.medicineId, medicineName: inventory.medicine.name, dosage: 'Demo', frequency: 'Demo', duration: 'Demo', quantity: 2 },
+        },
+      },
+    });
+    const order = async (quantity: number) => {
+      await fill(quantity, inventory.medicineId);
+      return api().post('/api/v1/orders').set('Authorization', patient.auth).send({ ...base, prescriptionId: rx.id });
+    };
+    expect((await order(1)).body.error.code).toBe('PRESCRIPTION_EXPIRED');
+    await prisma.prescription.update({ where: { id: rx.id }, data: { validUntil: istDate(0) } });
+    expect((await order(3)).body.error.code).toBe('PRESCRIPTION_QUANTITY_EXCEEDED');
+    const first = await order(2);
+    expect(first.status, JSON.stringify(first.body)).toBe(201);
+    expect((await order(1)).body.error.code).toBe('PRESCRIPTION_QUANTITY_EXCEEDED');
+    await api().post(`/api/v1/orders/${first.body.data.id}/cancel`).set('Authorization', patient.auth).send({});
+    expect((await order(2)).status).toBe(201);
   });
 });
 describe('pharmacy lifecycle and delivery', () => {

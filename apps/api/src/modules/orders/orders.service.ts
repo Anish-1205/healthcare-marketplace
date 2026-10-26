@@ -5,6 +5,7 @@ import type { AuthContext } from '../../types/auth';
 import { badRequest, conflict, forbidden, notFound } from '../../utils/errors';
 import { nextNumber } from '../../utils/sequence';
 import { toSkipTake } from '../../utils/http';
+import { istDate } from '../../utils/time';
 import { assertOrganizationAccess, canAccessOrganization, memberOrganizationIds } from '../../services/tenant.service';
 import { notify, notifyUsers, organizationRecipientIds } from '../../services/notification.service';
 import { logActivity } from '../../services/activity-log.service';
@@ -207,9 +208,23 @@ export async function checkout(auth: AuthContext, input: CheckoutInput) {
     const rx = prescriptionId ? await tx.prescription.findUnique({ where: { id: prescriptionId }, include: { items: true } }) : null;
     if (prescriptionId && (!rx || rx.patientId !== patientId || rx.status !== 'ISSUED'))
       throw badRequest('INVALID_PRESCRIPTION', 'Choose an issued prescription belonging to you.');
+    if (rx?.validUntil && rx.validUntil < istDate(0)) throw badRequest('PRESCRIPTION_EXPIRED', 'This prescription has expired.');
     if (rx && !pharmacy.acceptsPrescriptions) throw badRequest('PRESCRIPTION_UNAVAILABLE', 'This pharmacy does not accept prescriptions.');
     if (cart.items.some((i) => i.medicine.requiresPrescription && !rx?.items.some((r) => r.medicineId === i.medicineId)))
       throw badRequest('PRESCRIPTION_REQUIRED', 'Attach an issued prescription covering the prescription medicines in your cart.');
+    if (rx) {
+      // Earlier orders on this prescription count against it unless cancelled or rejected; the cart lock above serializes them.
+      const dispensed = await tx.orderItem.findMany({
+        where: { order: { prescriptionId: rx.id, status: { notIn: ['CANCELLED', 'REJECTED'] } } },
+        select: { medicineId: true, quantity: true, approvedQuantity: true },
+      });
+      for (const item of cart.items.filter((i) => i.medicine.requiresPrescription)) {
+        const prescribed = rx.items.filter((r) => r.medicineId === item.medicineId).reduce((s, r) => s + r.quantity, 0);
+        const used = dispensed.filter((d) => d.medicineId === item.medicineId).reduce((s, d) => s + (d.approvedQuantity ?? d.quantity), 0);
+        if (item.quantity > prescribed - used)
+          throw badRequest('PRESCRIPTION_QUANTITY_EXCEEDED', `Your prescription allows ${Math.max(prescribed - used, 0)} more of ${item.medicine.name}.`);
+      }
+    }
     const items = [];
     for (const item of [...cart.items].sort((a, b) => a.medicineId.localeCompare(b.medicineId))) {
       const inventory = await tx.pharmacyInventory.findUnique({

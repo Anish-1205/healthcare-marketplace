@@ -51,7 +51,7 @@ A user who is admin in A and ordinary staff in B can pass global admin permissio
 
 ### S06 — P1: prescription fulfillment checks are incomplete
 
-[cart.service.ts](../apps/api/src/modules/cart/cart.service.ts) and [orders.service.ts](../apps/api/src/modules/orders/orders.service.ts) require issued, owned prescriptions covering medicines, but do not enforce `validUntil`, cumulative dispensing or refill limits.
+[cart.service.ts](../apps/api/src/modules/cart/cart.service.ts) and [orders.service.ts](../apps/api/src/modules/orders/orders.service.ts) require issued, owned prescriptions covering medicines. **Partly fixed 2026-10-26:** checkout now rejects prescriptions past `validUntil` (IST date) and caps each prescription medicine at its prescribed quantity, counting earlier orders on the same prescription unless cancelled/rejected. Refill rules (multiple fills of the prescribed quantity) are not modelled.
 
 **Acceptance:** agree the rules, enforce them transactionally and test expired/repeated fulfillment. Regulatory sufficiency is **unverified**; this finding concerns code invariants.
 
