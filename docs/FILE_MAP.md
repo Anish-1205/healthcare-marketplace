@@ -1,6 +1,6 @@
 # File map
 
-Reviewed: 2026-09-29. Navigable inventory of the repository, not an exhaustive file listing. Cites the specific files already referenced across the other docs.
+Reviewed: 2026-10-31. Navigable inventory of the repository, not an exhaustive file listing. Cites the specific files already referenced across the other docs.
 
 ## Top level
 
@@ -83,7 +83,7 @@ apps/api/src/
 apps/web/src/
 ├── app.tsx, main.tsx        App bootstrap
 ├── routes/
-│   └── router.tsx            createBrowserRouter tree; no route-level code splitting (see PERFORMANCE_AUDIT)
+│   └── router.tsx            createBrowserRouter tree; selected dashboard/report routes are lazy
 ├── layouts/                  Per-portal shells: public, doctor, organization, pharmacy, admin
 ├── pages/                    One folder per portal/domain, mirrors apps/api/src/modules boundaries
 │   ├── admin/, appointments/, auth/, cart/, doctor/, doctors/, health-records/,
@@ -117,8 +117,6 @@ packages/shared/src/
 └── demo.ts               DEMO_ACCOUNTS, DEMO_DISCLAIMER constants
 ```
 
-## docs/ (this new set vs. the older set)
+## docs/
 
-This review authored: PROJECT_OVERVIEW.md, ARCHITECTURE.md, FEATURES.md, SECURITY_AUDIT.md (prior session, not modified here), plus TECH_STACK.md, DATABASE_SCHEMA.md, API_REFERENCE.md, CODE_QUALITY_AUDIT.md, PERFORMANCE_AUDIT.md, TECH_DEBT_AND_TODO.md, PRODUCTION_READINESS.md, ENVIRONMENT_AND_SETUP.md, CONVENTIONS.md, DECISIONS_LOG.md, FILE_MAP.md, and HANDOFF.md (this set).
-
-Older, separate historical docs left untouched: API.md, DATABASE.md, RBAC.md, DEMO_GUIDE.md, IMPLEMENTATION_PLAN.md, TESTING.md, DEMO_VERIFICATION.md. Treat the new set as current; the older set is historical context from earlier phases.
+`PRESENTATION_GUIDE.md` is the learning and demo entry point. `PROJECT_OVERVIEW.md`, `ARCHITECTURE.md`, `FEATURES.md`, `TECH_STACK.md`, `DATABASE_SCHEMA.md`, `API_REFERENCE.md`, and `RBAC.md` are current technical references. `DEMO_GUIDE.md`, `TESTING.md`, and `DEMO_VERIFICATION.md` are current operational references. Audit/backlog documents describe known limitations; `IMPLEMENTATION_PLAN.md` is historical planning context.

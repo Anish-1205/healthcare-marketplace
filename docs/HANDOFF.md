@@ -1,6 +1,6 @@
 # Handoff
 
-Reviewed: 2026-09-29. Written so another AI (or engineer) can continue this project using only the docs in this folder — this is a map to them, not a restatement. Start here, then follow the links.
+Reviewed: 2026-10-31. Written so another AI (or engineer) can continue this project using only the docs in this folder. For learning and presenting the application, start with [PRESENTATION_GUIDE](PRESENTATION_GUIDE.md); use this file for engineering continuation.
 
 ## What CareBridge is
 
@@ -36,7 +36,7 @@ A demo, multi-tenant healthcare marketplace: patients book doctors, receive pres
 | Why is it built this way? | [DECISIONS_LOG](DECISIONS_LOG.md) (all entries are inferred — no ADRs exist) |
 | Where is everything in the repo? | [FILE_MAP](FILE_MAP.md) |
 
-Older, separate historical docs (API.md, DATABASE.md, RBAC.md, DEMO_GUIDE.md, IMPLEMENTATION_PLAN.md, TESTING.md, DEMO_VERIFICATION.md) predate this review set and were left untouched — treat them as historical context only, not current reference.
+`DEMO_GUIDE.md`, `TESTING.md`, and `DEMO_VERIFICATION.md` are current operational references. `API.md` and `DATABASE.md` are short compatibility summaries; prefer `API_REFERENCE.md` and `DATABASE_SCHEMA.md`. `IMPLEMENTATION_PLAN.md` records historical planning and should not override implemented code or current verification.
 
 ## Priority items across security, tech debt, and production readiness
 
@@ -47,7 +47,7 @@ Older, separate historical docs (API.md, DATABASE.md, RBAC.md, DEMO_GUIDE.md, IM
 **P1 — required before real patient data or real commerce** (full list in [TECH_DEBT_AND_TODO](TECH_DEBT_AND_TODO.md)):
 - Cross-membership admin privilege leakage (S03), no session revocation (S04), no auth rate limiting (S05), incomplete prescription fulfillment checks (S06), unguarded destructive seed/reset (S07), logging/cache privacy gaps (S08), broad clinical access/audit gaps (S09).
 - Non-functional lint gate, thin frontend unit coverage.
-- Two unbounded list endpoints (`/admin/reviews`, `/favorites`), an unresolved same-patient booking race, no frontend code splitting.
+- Two unbounded list endpoints (`/admin/reviews`, `/favorites`), an unresolved same-patient booking race, and only partial frontend route splitting.
 - Entirely absent real-world infrastructure: payment gateway, delivery/logistics integration, provider credential verification, email/SMS transport.
 
 **Structural gaps not fixable by a code change alone** (see [PRODUCTION_READINESS](PRODUCTION_READINESS.md)): no deploy pipeline, no SPA hosting decision, no monitoring/log aggregation, no backup automation, compliance review not started.

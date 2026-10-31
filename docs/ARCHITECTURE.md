@@ -1,6 +1,8 @@
 # Architecture
 
-Reviewed: 2026-09-29. These diagrams describe the working tree. Infrastructure beyond the local Compose database is **unverified**.
+Reviewed: 2026-10-31. These diagrams describe the working tree at `d1e637d`. Infrastructure beyond the local Compose database is **unverified**.
+
+Interactive, source-linked views: [system architecture](../.archify/carebridge-demo-20261031-133500/carebridge-architecture.html), [golden demo workflow](../.archify/carebridge-demo-20261031-133500/golden-demo-workflow.html), [protected request sequence](../.archify/carebridge-demo-20261031-133500/protected-request-sequence.html), and [order lifecycle](../.archify/carebridge-demo-20261031-133500/order-lifecycle.html). For a presentation walkthrough, start with [PRESENTATION_GUIDE](PRESENTATION_GUIDE.md).
 
 ## Components
 
@@ -102,7 +104,7 @@ flowchart TD
 | Pharmacy | Order list/detail and processing |
 | Platform | Entity management, approvals, employees, settings, activity and reports |
 
-`router.tsx` eagerly imports route pages. No route-level splitting is implemented there. Shared contracts are maintained manually; no OpenAPI-generated client exists.
+`router.tsx` still imports most route pages eagerly, but organization dashboard/reports and admin dashboard/reports use route-level lazy imports. Shared contracts are maintained manually; no OpenAPI-generated client exists.
 
 ## Persistence and operational boundary
 

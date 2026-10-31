@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Protected CareBridge Request Sequence",
+    "locale": "en",
+    "output": ".archify/carebridge-demo-20261031-133500/protected-request-sequence.html",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/Anish-1205/healthcare-marketplace.git", "provider": "github", "link_mode": "web", "revision": "d1e637db2d97c3f34483901a5e90a99096477189" }
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "Signed-in User", "sublabel": "browser session", "sources": [{ "path": "apps/web/src/routes/router.tsx", "line": 89, "end_line": 118 }] },
+    { "id": "web", "type": "frontend", "label": "React SPA", "sublabel": "page + query hook", "sources": [{ "path": "apps/web/src/routes/router.tsx", "line": 73, "end_line": 190 }] },
+    { "id": "client", "type": "frontend", "label": "Fetch Client", "sublabel": "bearer token + JSON", "sources": [{ "path": "apps/web/src/api/client.ts", "line": 32, "end_line": 56 }] },
+    { "id": "api", "type": "backend", "label": "Express Route", "sublabel": "middleware + Zod handler", "sources": [{ "path": "apps/api/src/app.ts", "line": 9, "end_line": 27 }, { "path": "apps/api/src/routes/index.ts", "line": 28, "end_line": 58 }] },
+    { "id": "auth", "type": "security", "label": "Auth + RBAC", "sublabel": "JWT + current roles", "sources": [{ "path": "apps/api/src/middleware/auth.ts", "line": 13, "end_line": 57 }, { "path": "apps/api/src/services/auth-context.service.ts", "line": 58, "end_line": 79 }] },
+    { "id": "service", "type": "backend", "label": "Domain Service", "sublabel": "ownership + state rules", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 188, "end_line": 331 }] },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Prisma transaction", "sources": [{ "path": "apps/api/src/config/prisma.ts", "line": 1, "end_line": 15 }] }
+  ],
+  "segments": [
+    { "from": 150, "to": 240, "label": "Browser request" },
+    { "from": 250, "to": 390, "label": "Authenticate and authorize" },
+    { "from": 400, "to": 530, "label": "Business operation" },
+    { "from": 540, "to": 650, "label": "Response" }
+  ],
+  "messages": [
+    { "id": "action", "from": "user", "to": "web", "y": 165, "label": "submit action" },
+    { "id": "hook", "from": "web", "to": "client", "y": 198, "label": "call API wrapper" },
+    { "id": "http", "from": "client", "to": "api", "y": 230, "label": "HTTP JSON + Bearer token", "variant": "emphasis" },
+    { "id": "verify", "from": "api", "to": "auth", "y": 270, "label": "verify JWT", "variant": "security" },
+    { "id": "load", "from": "auth", "to": "db", "y": 305, "label": "load user, roles, memberships", "variant": "security" },
+    { "id": "context", "from": "db", "to": "auth", "y": 340, "label": "current authorization context", "variant": "return" },
+    { "id": "allow", "from": "auth", "to": "api", "y": 375, "label": "allow or 401/403", "variant": "security" },
+    { "id": "command", "from": "api", "to": "service", "y": 415, "label": "validated input + AuthContext", "variant": "emphasis" },
+    { "id": "transaction", "from": "service", "to": "db", "y": 455, "label": "query or transaction", "note": "Service checks tenant ownership and state rules before writing." },
+    { "id": "result", "from": "db", "to": "service", "y": 535, "label": "persisted result", "variant": "return" },
+    { "id": "dto", "from": "service", "to": "api", "y": 570, "label": "response DTO", "variant": "return" },
+    { "id": "json", "from": "api", "to": "client", "y": 600, "label": "JSON envelope", "variant": "return" },
+    { "id": "render", "from": "client", "to": "web", "y": 630, "label": "cache result + render", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "web", "from": 190, "to": 640, "type": "frontend" },
+    { "participant": "client", "from": 195, "to": 635, "type": "frontend" },
+    { "participant": "api", "from": 225, "to": 610, "type": "backend" },
+    { "participant": "auth", "from": 265, "to": 385, "type": "security" },
+    { "participant": "service", "from": 410, "to": 580, "type": "backend" },
+    { "participant": "db", "from": 300, "to": 540, "type": "database" }
+  ],
+  "cards": [
+    { "dot": "rose", "title": "Security model", "items": ["UI guards are not trusted as authorization", "The API rebuilds authorization context from the database on every protected request"] },
+    { "dot": "emerald", "title": "Service ownership", "items": ["Routes parse transport input", "Domain services enforce ownership, tenant scope and state transitions"] }
+  ]
+}

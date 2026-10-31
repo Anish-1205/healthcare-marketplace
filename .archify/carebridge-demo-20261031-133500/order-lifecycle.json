@@ -1,0 +1,44 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "CareBridge Order Lifecycle",
+    "locale": "en",
+    "output": ".archify/carebridge-demo-20261031-133500/order-lifecycle.html",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/Anish-1205/healthcare-marketplace.git", "provider": "github", "link_mode": "web", "revision": "d1e637db2d97c3f34483901a5e90a99096477189" }
+  },
+  "mainPath": ["pending", "confirmed", "preparing", "out", "delivered"],
+  "states": [
+    { "id": "pending", "type": "start", "label": "Pending", "step": "01", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 258, "end_line": 295 }] },
+    { "id": "review", "type": "decision", "label": "Rx Review", "sublabel": "stock + price check", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 400, "end_line": 449 }] },
+    { "id": "confirmed", "type": "active", "label": "Confirmed", "step": "02", "sources": [{ "path": "packages/shared/src/statuses.ts", "line": 63, "end_line": 73 }] },
+    { "id": "preparing", "type": "active", "label": "Preparing", "step": "03", "sources": [{ "path": "packages/shared/src/statuses.ts", "line": 63, "end_line": 73 }] },
+    { "id": "ready", "type": "waiting", "label": "Ready", "step": "04", "sources": [{ "path": "apps/api/src/modules/deliveries/deliveries.service.ts", "line": 6, "end_line": 24 }] },
+    { "id": "out", "type": "external", "label": "Out", "step": "05", "sources": [{ "path": "apps/api/src/modules/deliveries/deliveries.service.ts", "line": 28, "end_line": 48 }] },
+    { "id": "delivered", "type": "success", "label": "Delivered", "step": "06", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 333, "end_line": 397 }] },
+    { "id": "cancelled", "type": "neutral", "label": "Cancelled", "sublabel": "patient or pharmacy stops early", "tag": "terminal", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 451, "end_line": 458 }] },
+    { "id": "rejected", "type": "failure", "label": "Rejected", "sublabel": "pharmacy gives a reason", "tag": "terminal", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 400, "end_line": 449 }] }
+  ],
+  "transitions": [
+    { "id": "pending-review", "from": "pending", "to": "review", "label": "Rx order" },
+    { "id": "review-confirmed", "from": "review", "to": "confirmed", "label": "approve" },
+    { "id": "confirmed-preparing", "from": "confirmed", "to": "preparing" },
+    { "id": "preparing-ready", "from": "preparing", "to": "ready" },
+    { "id": "ready-out", "from": "ready", "to": "out", "variant": "dashed" },
+    { "id": "out-delivered", "from": "out", "to": "delivered", "variant": "emphasis" },
+    { "id": "pending-confirmed", "from": "pending", "to": "confirmed" },
+    { "id": "preparing-out", "from": "preparing", "to": "out", "label": "direct dispatch", "variant": "dashed" },
+    { "id": "ready-delivered", "from": "ready", "to": "delivered", "label": "customer pickup" },
+    { "id": "pending-cancelled", "from": "pending", "to": "cancelled", "label": "cancel" },
+    { "id": "review-cancelled", "from": "review", "to": "cancelled", "label": "cancel" },
+    { "id": "confirmed-cancelled", "from": "confirmed", "to": "cancelled", "label": "cancel before preparation" },
+    { "id": "pending-rejected", "from": "pending", "to": "rejected", "label": "reject with reason", "variant": "security" },
+    { "id": "review-rejected", "from": "review", "to": "rejected", "label": "cannot fulfil", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Source of truth", "items": ["The shared transition table drives both API validation and UI actions", "Every mutation appends order or delivery status history"] },
+    { "dot": "amber", "title": "Fulfilment branches", "items": ["Pickup can finish directly from Ready for Pickup", "Delivery uses a separate simulated agent lifecycle"] },
+    { "dot": "rose", "title": "Failure behavior", "items": ["Cancellation and rejection restore inventory", "Paid demo payments are marked refunded; pending payments fail"] }
+  ]
+}

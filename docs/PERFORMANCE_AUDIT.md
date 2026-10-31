@@ -40,9 +40,9 @@ Cross-checked against [DATABASE_SCHEMA](DATABASE_SCHEMA.md): the high-traffic fi
 
 ## Frontend
 
-### PF06 — P1: no route-level code splitting
+### PF06 — P1: route-level code splitting is partial
 
-[router.tsx](../apps/web/src/routes/router.tsx) statically imports every page component (confirmed: zero occurrences of `lazy(` in the file). All portals — patient, doctor, organization, pharmacy, platform admin — ship in the same JS bundle regardless of which the visiting user actually needs. For a multi-portal app this materially inflates initial bundle size and first-load time. **Recommendation:** convert page imports to `React.lazy` + route-level `Suspense` boundaries, at minimum splitting by portal (patient/doctor/organization/pharmacy/admin).
+[router.tsx](../apps/web/src/routes/router.tsx) lazily loads the organization dashboard/reports and admin dashboard/reports, but most patient, doctor, pharmacy, organization, and admin pages are still static imports. The initial bundle therefore retains most portal code. **Recommendation:** finish splitting by portal or high-level route, guided by the production bundle report rather than converting every page mechanically.
 
 ### PF07 — P2: TanStack Query defaults are conservative but untuned per-query
 
@@ -55,7 +55,7 @@ Cross-checked against [DATABASE_SCHEMA](DATABASE_SCHEMA.md): the high-traffic fi
 | PF01 | P1 | `GET /admin/reviews` unbounded `findMany` |
 | PF02 | P1 | `GET /favorites` unbounded `findMany` |
 | PF05 | P1 | No constraint/lock closes the same-patient overlapping-appointment race |
-| PF06 | P1 | No route-level code splitting in `router.tsx`; full app ships in one bundle |
+| PF06 | P1 | Route splitting covers four dashboard/report routes; most portal pages remain eager |
 | PF03 | P1 | `GET /reviews` (public, unauthenticated-reachable) is confirmed unbounded |
 | PF04 | P2 | Organization-portal list/dashboard reads unbounded (acceptable at current scale) |
 | PF07 | P2 | No per-query cache tuning for static reference data |

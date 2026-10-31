@@ -1,5 +1,7 @@
 # Client demo guide
 
+For the narrative, architecture talking points, likely questions, and rehearsal checklist, use [PRESENTATION_GUIDE](PRESENTATION_GUIDE.md). Keep the [interactive golden workflow](../.archify/carebridge-demo-20261031-133500/golden-demo-workflow.html) beside the live application.
+
 Run the setup in [README](../README.md), open `http://localhost:5173`, and keep `DEMO_MODE=true`. Use `pnpm db:seed:ready` before a live walkthrough; it replaces demo records and signs out old sessions. Every seeded account below uses `Demo@123`. Open another browser profile/private window when switching roles so the patient session stays available. Numbers such as `RX-<year>-00125` and `ORD-<year>-0042` are guaranteed only immediately after an untouched ready seed. All medical text, payments, documents, lab reports, and delivery are demo data.
 
 ## Demo 1 — Patient → doctor → prescription → pharmacy → delivery

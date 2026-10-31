@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "CareBridge Golden Demo Workflow",
+    "locale": "en",
+    "output": ".archify/carebridge-demo-20261031-133500/golden-demo-workflow.html",
+    "quality_profile": "showcase",
+    "repository": { "url": "https://github.com/Anish-1205/healthcare-marketplace.git", "provider": "github", "link_mode": "web", "revision": "d1e637db2d97c3f34483901a5e90a99096477189" }
+  },
+  "lanes": [
+    { "id": "patient", "label": "Patient — Rahul Verma" },
+    { "id": "doctor", "label": "Doctor — Dr. Maya Rao" },
+    { "id": "pharmacy", "label": "Pharmacy — City Care" },
+    { "id": "platform", "label": "Platform operations" }
+  ],
+  "phases": [
+    { "id": "care", "label": "Book care", "fromCol": 0, "toCol": 1 },
+    { "id": "clinical", "label": "Consult + prescribe", "fromCol": 2, "toCol": 2, "variant": "emphasis" },
+    { "id": "fulfilment", "label": "Order + deliver", "fromCol": 3, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["discover", "book", "consult", "issue", "choose", "checkout", "review", "prepare", "deliver", "track"],
+  "nodes": [
+    { "id": "discover", "lane": "patient", "col": 0, "type": "frontend", "label": "Find Dr. Maya Rao", "sublabel": "search + real availability", "sources": [{ "path": "apps/web/src/routes/router.tsx", "line": 78, "end_line": 92 }] },
+    { "id": "book", "lane": "patient", "col": 1, "type": "backend", "label": "Book and pay", "sublabel": "appointment + simulated payment", "sources": [{ "path": "apps/api/src/modules/appointments/appointments.service.ts", "line": 237, "end_line": 368 }] },
+    { "id": "consult", "lane": "doctor", "col": 1, "type": "backend", "label": "Start consultation", "sublabel": "manual clinical notes", "sources": [{ "path": "apps/api/src/modules/consultations/consultations.service.ts", "line": 106, "end_line": 187 }] },
+    { "id": "issue", "lane": "doctor", "col": 2, "type": "backend", "label": "Complete + issue Rx", "sublabel": "draft becomes patient-visible", "sources": [{ "path": "apps/api/src/modules/consultations/consultations.service.ts", "line": 190, "end_line": 250 }, { "path": "apps/api/src/modules/prescriptions/prescriptions.service.ts", "line": 222, "end_line": 270 }] },
+    { "id": "choose", "lane": "patient", "col": 2, "type": "frontend", "label": "Choose pharmacy", "sublabel": "match prescription to inventory", "sources": [{ "path": "apps/api/src/modules/prescriptions/prescriptions.service.ts", "line": 312, "end_line": 374 }] },
+    { "id": "checkout", "lane": "patient", "col": 3, "type": "backend", "label": "Place order", "sublabel": "validate Rx, reserve stock, snapshot price", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 188, "end_line": 331 }] },
+    { "id": "review", "lane": "pharmacy", "col": 3, "type": "security", "label": "Review prescription", "sublabel": "confirm stock and pricing", "sources": [{ "path": "apps/api/src/modules/orders/orders.service.ts", "line": 400, "end_line": 449 }] },
+    { "id": "prepare", "lane": "pharmacy", "col": 4, "type": "backend", "label": "Prepare medicines", "sublabel": "ready for pickup", "sources": [{ "path": "packages/shared/src/statuses.ts", "line": 63, "end_line": 73 }] },
+    { "id": "deliver", "lane": "pharmacy", "col": 5, "type": "external", "label": "Simulate delivery", "sublabel": "assign, pick up, on the way, delivered", "sources": [{ "path": "apps/api/src/modules/deliveries/deliveries.service.ts", "line": 6, "end_line": 50 }] },
+    { "id": "track", "lane": "patient", "col": 5, "type": "frontend", "label": "Track completion", "sublabel": "shared timestamped history", "sources": [{ "path": "apps/web/src/routes/router.tsx", "line": 98, "end_line": 101 }] },
+    { "id": "audit", "lane": "platform", "col": 5, "type": "database", "label": "Inspect transactions", "sublabel": "admin appointments + orders", "sources": [{ "path": "apps/web/src/routes/router.tsx", "line": 168, "end_line": 187 }] }
+  ],
+  "edges": [
+    { "id": "discover-book", "from": "discover", "to": "book", "role": "main" },
+    { "id": "book-consult", "from": "book", "to": "consult", "label": "confirmed appointment", "role": "main" },
+    { "id": "consult-issue", "from": "consult", "to": "issue", "role": "main" },
+    { "id": "issue-choose", "from": "issue", "to": "choose", "label": "issued prescription", "role": "main", "variant": "emphasis" },
+    { "id": "choose-checkout", "from": "choose", "to": "checkout", "role": "main" },
+    { "id": "checkout-review", "from": "checkout", "to": "review", "label": "new paid order", "role": "main" },
+    { "id": "review-prepare", "from": "review", "to": "prepare", "role": "main" },
+    { "id": "prepare-deliver", "from": "prepare", "to": "deliver", "role": "main", "variant": "dashed" },
+    { "id": "deliver-track", "from": "deliver", "to": "track", "label": "status history", "role": "main" },
+    { "id": "checkout-audit", "from": "checkout", "to": "audit", "label": "same shared record", "role": "async", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "What proves integration", "items": ["Each role changes the same persisted business records", "The patient sees pharmacy transitions without duplicate mock state"] },
+    { "dot": "rose", "title": "Clinical safety", "items": ["The doctor enters every clinical note and medicine manually", "The application does not diagnose or generate prescriptions"] }
+  ]
+}

@@ -132,5 +132,7 @@ The suite covers login for every demo account, registration, password reset, tok
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE.md) · [API](docs/API.md) · [RBAC](docs/RBAC.md)
-- [Client demo guide](docs/DEMO_GUIDE.md) · [Testing](docs/TESTING.md) · [Demo verification](docs/DEMO_VERIFICATION.md) · [Production readiness](docs/PRODUCTION_READINESS.md) · [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
+- **Start here for a presentation:** [codebase and demo guide](docs/PRESENTATION_GUIDE.md)
+- [Interactive architecture](.archify/carebridge-demo-20261031-133500/carebridge-architecture.html) · [golden workflow](.archify/carebridge-demo-20261031-133500/golden-demo-workflow.html) · [request sequence](.archify/carebridge-demo-20261031-133500/protected-request-sequence.html) · [order lifecycle](.archify/carebridge-demo-20261031-133500/order-lifecycle.html)
+- [Architecture](docs/ARCHITECTURE.md) · [Database schema](docs/DATABASE_SCHEMA.md) · [API reference](docs/API_REFERENCE.md) · [RBAC](docs/RBAC.md)
+- [Client demo steps](docs/DEMO_GUIDE.md) · [Testing](docs/TESTING.md) · [Demo verification](docs/DEMO_VERIFICATION.md) · [Production readiness](docs/PRODUCTION_READINESS.md)

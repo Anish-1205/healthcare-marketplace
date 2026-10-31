@@ -28,7 +28,7 @@ Reviewed: 2026-09-29. Synthesizes [SECURITY_AUDIT](SECURITY_AUDIT.md), [FEATURES
 
 12. **Paginate `GET /admin/reviews` (PF01), `GET /favorites` (PF02), and `GET /reviews` (PF03).** Add `take`/`skip` and a response `meta` block consistent with every other list endpoint; `GET /reviews` is the highest-exposure of the three since it's public and unauthenticated-reachable.
 13. **Close the same-patient overlapping-appointment race (PF05).** Either add a serializable transaction/row lock on the patient's active appointments during booking, or a database constraint analogous to the doctor-slot partial unique index.
-14. **Introduce route-level code splitting (PF06).** Convert `router.tsx` page imports to `React.lazy`, split at minimum by portal.
+14. **Complete route-level code splitting (PF06).** Four dashboard/report routes are lazy; split the remaining large portal groups based on bundle evidence.
 
 ### Feature gaps material to production readiness ([FEATURES](FEATURES.md))
 

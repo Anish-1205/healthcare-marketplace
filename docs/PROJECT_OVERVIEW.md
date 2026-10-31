@@ -1,6 +1,6 @@
 # Project overview
 
-Reviewed: 2026-09-29. Evidence is the current working tree, including local edits. Start with [HANDOFF](HANDOFF.md) for a condensed continuation guide.
+Reviewed: 2026-10-31. Evidence is the current working tree, including local edits. Start with [PRESENTATION_GUIDE](PRESENTATION_GUIDE.md) to learn and demonstrate the system, or [HANDOFF](HANDOFF.md) to continue engineering work.
 
 ## Product and users
 
