@@ -10,3 +10,16 @@ coverage/
 !.vscode/extensions.json
 apps/api/uploads/
 apps/web/test-results/
+
+# Generated diagram validation evidence (final HTML/JSON candidates stay trackable)
+.archify/**/*.browser-check.json
+.archify/**/*.delivery.json
+.archify/**/*.finalize.json
+.archify/**/*.finalize-summary.json
+.archify/**/review-*/
+
+# Local Graphify rebuild state (published graph/report files stay trackable)
+graphify-out/.graphify_*
+graphify-out/cache/
+graphify-out/cost.json
+graphify-out/manifest.json
